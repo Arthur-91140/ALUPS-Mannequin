@@ -1,6 +1,12 @@
 {% extends "base.html" %}
 {% block title %}Formulaire envoyé{% endblock %}
 
+{% block topbar_right %}
+<a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline btn-sm">
+    <i class="ti ti-dashboard"></i> Administration
+</a>
+{% endblock %}
+
 {% block content %}
 <div class="success-wrap">
     <div class="card">

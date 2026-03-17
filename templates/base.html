@@ -10,6 +10,7 @@
 <body>
     <div class="topbar">
         <img src="{{ url_for('static', filename='img/logo.png') }}" alt="ALUPS" class="topbar-logo">
+        {% block topbar_right %}{% endblock %}
     </div>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
