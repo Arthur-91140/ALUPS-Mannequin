@@ -1,0 +1,96 @@
+{% extends "base_admin.html" %}
+{% block title %}Historique — {{ mannequin.type }} N°{{ mannequin.numero }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-sm btn-outline-secondary me-2">
+            <i class="bi bi-arrow-left"></i> Retour
+        </a>
+        <span class="h4 mb-0">
+            <span class="badge badge-type badge-{{ mannequin.type|lower }}">{{ mannequin.type }}</span>
+            Mannequin N°{{ mannequin.numero }}
+        </span>
+    </div>
+    <div>
+        <a href="{{ url_for('admin_export_mannequin', mannequin_id=mannequin.id) }}" class="btn btn-success btn-sm">
+            <i class="bi bi-file-earmark-excel"></i> Excel de ce mannequin
+        </a>
+    </div>
+</div>
+
+<div class="admin-section">
+    <h2><i class="bi bi-list-ul"></i> {{ interventions|length }} intervention(s)</h2>
+
+    {% if interventions %}
+    <div class="table-responsive">
+        <table class="table table-hover table-sm">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Prénom</th>
+                    <th>Nom</th>
+                    <th class="text-center">Nettoyage</th>
+                    <th class="text-center">Poumons</th>
+                    <th class="text-center">Réparation</th>
+                    <th>Informations</th>
+                    <th>Signature</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for i in interventions %}
+                <tr>
+                    <td>{{ i.date }}</td>
+                    <td>{{ i.prenom }}</td>
+                    <td>{{ i.nom }}</td>
+                    <td class="text-center">
+                        {% if i.nettoyage %}
+                            <span class="text-success fw-bold">Oui</span>
+                        {% else %}
+                            <span class="text-danger">Non</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-center">
+                        {% if i.changement_poumons %}
+                            <span class="text-success fw-bold">Oui</span>
+                        {% else %}
+                            <span class="text-danger">Non</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-center">
+                        {% if i.reparation %}
+                            <span class="text-danger fw-bold">Oui</span>
+                        {% else %}
+                            <span class="text-success">Non</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ i.informations or '—' }}</td>
+                    <td>
+                        {% if i.signature_path %}
+                        <img src="{{ url_for('serve_signature', filename=i.signature_path) }}"
+                             alt="Signature" class="sig-thumbnail">
+                        {% else %}
+                        <span class="text-muted">—</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end">
+                        <form method="POST"
+                              action="{{ url_for('admin_delete_intervention', intervention_id=i.id) }}"
+                              class="d-inline"
+                              onsubmit="return confirm('Supprimer cette intervention ?')">
+                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Supprimer">
+                                <i class="bi bi-trash3"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="text-muted">Aucune intervention enregistrée pour ce mannequin.</p>
+    {% endif %}
+</div>
+{% endblock %}
