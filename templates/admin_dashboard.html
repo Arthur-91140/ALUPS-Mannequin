@@ -68,9 +68,9 @@
                         <td>{{ i.date }}</td>
                         <td><span class="badge badge-{{ i.m_type|lower }}">{{ i.m_type }}</span> N°{{ i.m_numero }}</td>
                         <td>{{ i.prenom }} {{ i.nom }}</td>
-                        <td class="tc">{% if i.nettoyage %}<i class="ti ti-circle-check-filled st-yes"></i>{% else %}<i class="ti ti-circle-minus st-no"></i>{% endif %}</td>
-                        <td class="tc">{% if i.changement_poumons %}<i class="ti ti-circle-check-filled st-yes"></i>{% else %}<i class="ti ti-circle-minus st-no"></i>{% endif %}</td>
-                        <td class="tc">{% if i.reparation %}<i class="ti ti-alert-circle-filled st-warn"></i>{% else %}<i class="ti ti-circle-check-filled st-ok"></i>{% endif %}</td>
+                        <td class="tc">{% if i.nettoyage %}<i class="ti ti-circle-check st-yes"></i>{% else %}<i class="ti ti-circle-x st-no"></i>{% endif %}</td>
+                        <td class="tc">{% if i.changement_poumons %}<i class="ti ti-circle-check st-yes"></i>{% else %}<i class="ti ti-circle-x st-no"></i>{% endif %}</td>
+                        <td class="tc">{% if i.reparation %}<i class="ti ti-alert-triangle st-warn"></i>{% else %}<i class="ti ti-circle-check st-ok"></i>{% endif %}</td>
                     </tr>
                     {% endfor %}
                 </tbody>

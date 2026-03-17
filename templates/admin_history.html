@@ -23,9 +23,9 @@
                     <td>{{ i.date }}</td>
                     <td>{{ i.prenom }}</td>
                     <td>{{ i.nom }}</td>
-                    <td class="tc">{% if i.nettoyage %}<i class="ti ti-circle-check-filled st-yes"></i>{% else %}<i class="ti ti-circle-minus st-no"></i>{% endif %}</td>
-                    <td class="tc">{% if i.changement_poumons %}<i class="ti ti-circle-check-filled st-yes"></i>{% else %}<i class="ti ti-circle-minus st-no"></i>{% endif %}</td>
-                    <td class="tc">{% if i.reparation %}<i class="ti ti-alert-circle-filled st-warn"></i>{% else %}<i class="ti ti-circle-check-filled st-ok"></i>{% endif %}</td>
+                    <td class="tc">{% if i.nettoyage %}<i class="ti ti-circle-check st-yes"></i>{% else %}<i class="ti ti-circle-x st-no"></i>{% endif %}</td>
+                    <td class="tc">{% if i.changement_poumons %}<i class="ti ti-circle-check st-yes"></i>{% else %}<i class="ti ti-circle-x st-no"></i>{% endif %}</td>
+                    <td class="tc">{% if i.reparation %}<i class="ti ti-alert-triangle st-warn"></i>{% else %}<i class="ti ti-circle-check st-ok"></i>{% endif %}</td>
                     <td>{{ i.informations or '—' }}</td>
                     <td>{% if i.signature_path %}<img src="{{ url_for('serve_signature', filename=i.signature_path) }}" alt="Signature" class="sig-thumb">{% else %}<span class="st-no">—</span>{% endif %}</td>
                     <td><div class="actions"><form method="POST" action="{{ url_for('admin_delete_intervention', intervention_id=i.id) }}" style="display:inline;" onsubmit="return confirm('Supprimer cette intervention ?')"><button class="btn btn-outline btn-sm" data-c="red"><i class="ti ti-trash"></i></button></form></div></td>
