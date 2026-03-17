@@ -3,37 +3,37 @@
 
 {% block content %}
 <div class="admin-title-bar">
-    <div class="flex items-center gap-md">
-        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline btn-sm">
-            <i class="bi bi-arrow-left"></i>
-        </a>
+    <div style="display:flex; align-items:center; gap:0.75rem;">
+        <a href="{{ url_for('admin_dashboard') }}" role="button" class="outline"
+           style="padding:0.35rem 0.6rem; margin:0;"><i class="ti ti-arrow-left"></i></a>
         <h1>
             <span class="badge badge-{{ mannequin.type|lower }}">{{ mannequin.type }}</span>
             Mannequin N°{{ mannequin.numero }}
         </h1>
     </div>
-    <a href="{{ url_for('admin_export_mannequin', mannequin_id=mannequin.id) }}" class="btn btn-green btn-sm">
-        <i class="bi bi-file-earmark-excel"></i> Excel
+    <a href="{{ url_for('admin_export_mannequin', mannequin_id=mannequin.id) }}" role="button" class="btn-green"
+       style="font-size:0.85rem; padding:0.4rem 0.8rem;">
+        <i class="ti ti-file-spreadsheet"></i> Excel
     </a>
 </div>
 
-<div class="section">
-    <div class="section-title"><i class="bi bi-list-ul"></i> {{ interventions|length }} intervention(s)</div>
+<article>
+    <p class="section-title"><i class="ti ti-list"></i> {{ interventions|length }} intervention(s)</p>
 
     {% if interventions %}
-    <div class="table-wrap">
+    <div style="overflow-x:auto;">
         <table>
             <thead>
                 <tr>
                     <th>Date</th>
                     <th>Prénom</th>
                     <th>Nom</th>
-                    <th class="td-center">Nettoyage</th>
-                    <th class="td-center">Poumons</th>
-                    <th class="td-center">Réparation</th>
+                    <th class="td-c">Nettoyage</th>
+                    <th class="td-c">Poumons</th>
+                    <th class="td-c">Réparation</th>
                     <th>Informations</th>
                     <th>Signature</th>
-                    <th class="td-end">Actions</th>
+                    <th class="td-r">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -42,45 +42,31 @@
                     <td>{{ i.date }}</td>
                     <td>{{ i.prenom }}</td>
                     <td>{{ i.nom }}</td>
-                    <td class="td-center">
-                        {% if i.nettoyage %}
-                            <span class="st-yes" style="font-weight:600;">Oui</span>
-                        {% else %}
-                            <span class="st-no">Non</span>
-                        {% endif %}
+                    <td class="td-c">
+                        {% if i.nettoyage %}<strong class="st-yes">Oui</strong>
+                        {% else %}<span class="st-no">Non</span>{% endif %}
                     </td>
-                    <td class="td-center">
-                        {% if i.changement_poumons %}
-                            <span class="st-yes" style="font-weight:600;">Oui</span>
-                        {% else %}
-                            <span class="st-no">Non</span>
-                        {% endif %}
+                    <td class="td-c">
+                        {% if i.changement_poumons %}<strong class="st-yes">Oui</strong>
+                        {% else %}<span class="st-no">Non</span>{% endif %}
                     </td>
-                    <td class="td-center">
-                        {% if i.reparation %}
-                            <span class="st-warn" style="font-weight:600;">Oui</span>
-                        {% else %}
-                            <span class="st-ok">Non</span>
-                        {% endif %}
+                    <td class="td-c">
+                        {% if i.reparation %}<strong class="st-warn">Oui</strong>
+                        {% else %}<span class="st-ok">Non</span>{% endif %}
                     </td>
                     <td>{{ i.informations or '—' }}</td>
                     <td>
                         {% if i.signature_path %}
-                        <img src="{{ url_for('serve_signature', filename=i.signature_path) }}"
-                             alt="Signature" class="sig-thumb">
-                        {% else %}
-                        <span style="color:var(--text-muted);">—</span>
-                        {% endif %}
+                        <img src="{{ url_for('serve_signature', filename=i.signature_path) }}" alt="Signature" class="sig-thumb">
+                        {% else %}<span class="st-no">—</span>{% endif %}
                     </td>
-                    <td class="td-end">
-                        <form method="POST"
-                              action="{{ url_for('admin_delete_intervention', intervention_id=i.id) }}"
-                              class="inline-form"
-                              onsubmit="return confirm('Supprimer cette intervention ?')">
-                            <button type="submit" class="btn btn-outline-red btn-sm">
-                                <i class="bi bi-trash3"></i>
-                            </button>
-                        </form>
+                    <td>
+                        <div class="actions">
+                            <form method="POST" action="{{ url_for('admin_delete_intervention', intervention_id=i.id) }}"
+                                  onsubmit="return confirm('Supprimer cette intervention ?')">
+                                <button class="outline" data-color="red"><i class="ti ti-trash"></i></button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
                 {% endfor %}
@@ -88,7 +74,7 @@
         </table>
     </div>
     {% else %}
-    <p style="color:var(--text-muted); font-size:0.9rem;">Aucune intervention enregistrée pour ce mannequin.</p>
+    <p><small>Aucune intervention enregistrée pour ce mannequin.</small></p>
     {% endif %}
-</div>
+</article>
 {% endblock %}
