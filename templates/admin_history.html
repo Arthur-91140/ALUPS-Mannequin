@@ -5,14 +5,9 @@
 <div class="admin-bar">
     <div style="display:flex; align-items:center; gap:0.75rem;">
         <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline btn-sm"><i class="ti ti-arrow-left"></i></a>
-        <h1>
-            <span class="badge badge-{{ mannequin.type|lower }}">{{ mannequin.type }}</span>
-            Mannequin N°{{ mannequin.numero }}
-        </h1>
+        <h1><span class="badge badge-{{ mannequin.type|lower }}">{{ mannequin.type }}</span> Mannequin N°{{ mannequin.numero }}</h1>
     </div>
-    <a href="{{ url_for('admin_export_mannequin', mannequin_id=mannequin.id) }}" class="btn btn-green btn-sm">
-        <i class="ti ti-file-spreadsheet"></i> Excel
-    </a>
+    <a href="{{ url_for('admin_export_mannequin', mannequin_id=mannequin.id) }}" class="btn btn-green btn-sm"><i class="ti ti-file-spreadsheet"></i> Excel</a>
 </div>
 
 <div class="section">
@@ -21,58 +16,26 @@
     {% if interventions %}
     <div class="table-wrap">
         <table>
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Prénom</th>
-                    <th>Nom</th>
-                    <th class="tc">Nettoyage</th>
-                    <th class="tc">Poumons</th>
-                    <th class="tc">Réparation</th>
-                    <th>Informations</th>
-                    <th>Signature</th>
-                    <th class="tr">Actions</th>
-                </tr>
-            </thead>
+            <thead><tr><th>Date</th><th>Prénom</th><th>Nom</th><th class="tc">Nettoyage</th><th class="tc">Poumons</th><th class="tc">Réparation</th><th>Informations</th><th>Signature</th><th class="tr">Actions</th></tr></thead>
             <tbody>
                 {% for i in interventions %}
                 <tr>
                     <td>{{ i.date }}</td>
                     <td>{{ i.prenom }}</td>
                     <td>{{ i.nom }}</td>
-                    <td class="tc">
-                        {% if i.nettoyage %}<strong class="st-yes">Oui</strong>
-                        {% else %}<span class="st-no">Non</span>{% endif %}
-                    </td>
-                    <td class="tc">
-                        {% if i.changement_poumons %}<strong class="st-yes">Oui</strong>
-                        {% else %}<span class="st-no">Non</span>{% endif %}
-                    </td>
-                    <td class="tc">
-                        {% if i.reparation %}<strong class="st-warn">Oui</strong>
-                        {% else %}<span class="st-ok">Non</span>{% endif %}
-                    </td>
+                    <td class="tc">{% if i.nettoyage %}<strong class="st-yes">Oui</strong>{% else %}<span class="st-no">Non</span>{% endif %}</td>
+                    <td class="tc">{% if i.changement_poumons %}<strong class="st-yes">Oui</strong>{% else %}<span class="st-no">Non</span>{% endif %}</td>
+                    <td class="tc">{% if i.reparation %}<strong class="st-warn">Oui</strong>{% else %}<span class="st-ok">Non</span>{% endif %}</td>
                     <td>{{ i.informations or '—' }}</td>
-                    <td>
-                        {% if i.signature_path %}
-                        <img src="{{ url_for('serve_signature', filename=i.signature_path) }}" alt="Signature" class="sig-thumb">
-                        {% else %}<span class="st-no">—</span>{% endif %}
-                    </td>
-                    <td>
-                        <div class="actions">
-                            <form method="POST" action="{{ url_for('admin_delete_intervention', intervention_id=i.id) }}"
-                                  style="display:inline;" onsubmit="return confirm('Supprimer cette intervention ?')">
-                                <button class="btn btn-outline btn-sm" data-c="red"><i class="ti ti-trash"></i></button>
-                            </form>
-                        </div>
-                    </td>
+                    <td>{% if i.signature_path %}<img src="{{ url_for('serve_signature', filename=i.signature_path) }}" alt="Signature" class="sig-thumb">{% else %}<span class="st-no">—</span>{% endif %}</td>
+                    <td><div class="actions"><form method="POST" action="{{ url_for('admin_delete_intervention', intervention_id=i.id) }}" style="display:inline;" onsubmit="return confirm('Supprimer cette intervention ?')"><button class="btn btn-outline btn-sm" data-c="red"><i class="ti ti-trash"></i></button></form></div></td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
     {% else %}
-    <p style="color:var(--gray-400); font-size:0.9rem;">Aucune intervention enregistrée pour ce mannequin.</p>
+    <p style="color:var(--g400); font-size:0.9rem;">Aucune intervention enregistrée pour ce mannequin.</p>
     {% endif %}
 </div>
 {% endblock %}

@@ -3,19 +3,15 @@
 
 {% block content %}
 <div class="auth-page">
-    <div class="auth-card form-card">
-        <div class="form-card-header">
-            <i class="ti ti-shield-lock"></i> Connexion administrateur
-        </div>
-        <div class="form-card-body">
+    <div class="auth-box card">
+        <div class="card-head"><i class="ti ti-shield-lock"></i> Connexion administrateur</div>
+        <div class="card-body">
             <form method="POST">
                 <div class="field">
                     <label class="label">Mot de passe</label>
                     <input type="password" class="input" name="password" required autofocus>
                 </div>
-                <button type="submit" class="btn-submit">
-                    <i class="ti ti-login"></i> Se connecter
-                </button>
+                <button type="submit" class="btn-submit"><i class="ti ti-login"></i> Se connecter</button>
             </form>
         </div>
     </div>

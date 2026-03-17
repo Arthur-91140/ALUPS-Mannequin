@@ -2,16 +2,16 @@
 {% block title %}Formulaire de suivi{% endblock %}
 
 {% block content %}
-<div class="form-page">
-    <div class="form-card">
-        <div class="form-card-header">
+<div class="page-center">
+    <div class="card">
+        <div class="card-head">
             <i class="ti ti-clipboard-heart"></i> Suivi des mannequins
         </div>
-        <div class="form-card-body">
+        <div class="card-body">
             <form method="POST" action="{{ url_for('formulaire') }}" id="mainForm">
 
-                <p class="form-section">Mannequin</p>
-                <div class="form-grid">
+                <p class="fsec">Mannequin</p>
+                <div class="fgrid">
                     <div class="field">
                         <label class="label">Type <span class="req">*</span></label>
                         <select class="select" id="type_select" name="type_select" required>
@@ -30,14 +30,14 @@
                     </div>
                 </div>
 
-                <div class="form-divider"></div>
+                <div class="fdiv"></div>
 
-                <p class="form-section">Intervenant</p>
+                <p class="fsec">Intervenant</p>
                 <div class="field">
                     <label class="label">Date <span class="req">*</span></label>
                     <input type="date" class="input" name="date" value="{{ form_data.date if form_data else today }}" required>
                 </div>
-                <div class="form-grid">
+                <div class="fgrid">
                     <div class="field">
                         <label class="label">Prénom <span class="req">*</span></label>
                         <input type="text" class="input" name="prenom" value="{{ form_data.prenom if form_data else '' }}" required>
@@ -48,9 +48,9 @@
                     </div>
                 </div>
 
-                <div class="form-divider"></div>
+                <div class="fdiv"></div>
 
-                <p class="form-section">Actions réalisées</p>
+                <p class="fsec">Actions réalisées</p>
 
                 <div class="question">
                     <span class="question-text">Nettoyage effectué ? <span class="req">*</span></span>
@@ -88,7 +88,7 @@
                     </div>
                 </div>
 
-                <div class="form-divider"></div>
+                <div class="fdiv"></div>
 
                 <div class="field">
                     <label class="label">Informations à communiquer</label>
@@ -96,7 +96,7 @@
                               placeholder="Remarques, problèmes constatés...">{{ form_data.informations if form_data else '' }}</textarea>
                 </div>
 
-                <div class="sig-area">
+                <div class="field">
                     <label class="label">Signature <span class="req">*</span></label>
                     <div class="sig-box">
                         <button type="button" class="sig-clear" id="clearSig">

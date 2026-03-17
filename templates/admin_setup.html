@@ -3,11 +3,9 @@
 
 {% block content %}
 <div class="auth-page">
-    <div class="auth-card form-card">
-        <div class="form-card-header">
-            <i class="ti ti-settings"></i> Création du compte administrateur
-        </div>
-        <div class="form-card-body">
+    <div class="auth-box card">
+        <div class="card-head"><i class="ti ti-settings"></i> Création du compte administrateur</div>
+        <div class="card-body">
             <p class="auth-hint">Première connexion : créez votre mot de passe administrateur.</p>
             <form method="POST">
                 <div class="field">
@@ -18,9 +16,7 @@
                     <label class="label">Confirmer le mot de passe</label>
                     <input type="password" class="input" name="confirm" required minlength="4">
                 </div>
-                <button type="submit" class="btn-submit">
-                    <i class="ti ti-check"></i> Créer le compte
-                </button>
+                <button type="submit" class="btn-submit"><i class="ti ti-check"></i> Créer le compte</button>
             </form>
         </div>
     </div>

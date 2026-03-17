@@ -6,12 +6,11 @@
     <title>{% block title %}Suivi des mannequins{% endblock %} — ALUPS</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3/dist/tabler-icons.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    {% block head %}{% endblock %}
 </head>
 <body>
-    <header class="site-header">
-        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="ALUPS">
-    </header>
+    <div class="topbar">
+        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="ALUPS" class="topbar-logo">
+    </div>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}

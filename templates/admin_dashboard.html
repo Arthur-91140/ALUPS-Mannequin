@@ -4,9 +4,7 @@
 {% block content %}
 <div class="admin-bar">
     <h1><i class="ti ti-dashboard"></i> Tableau de bord</h1>
-    <a href="{{ url_for('admin_export') }}" class="btn btn-green">
-        <i class="ti ti-file-spreadsheet"></i> Télécharger l'Excel complet
-    </a>
+    <a href="{{ url_for('admin_export') }}" class="btn btn-green"><i class="ti ti-file-spreadsheet"></i> Télécharger l'Excel complet</a>
 </div>
 
 <div class="admin-grid">
@@ -27,33 +25,19 @@
         {% if mannequins %}
         <div class="table-wrap">
             <table>
-                <thead>
-                    <tr>
-                        <th>Type</th>
-                        <th>N°</th>
-                        <th class="tc">Interv.</th>
-                        <th>Lien</th>
-                        <th class="tr">Actions</th>
-                    </tr>
-                </thead>
+                <thead><tr><th>Type</th><th>N°</th><th class="tc">Interv.</th><th>Lien</th><th class="tr">Actions</th></tr></thead>
                 <tbody>
                     {% for m in mannequins %}
                     <tr>
                         <td><span class="badge badge-{{ m.type|lower }}">{{ m.type }}</span></td>
                         <td><strong>{{ m.numero }}</strong></td>
                         <td class="tc"><span class="pill">{{ m.nb_interventions }}</span></td>
-                        <td>
-                            <button class="btn btn-outline btn-sm"
-                                    onclick="copyLink(this,'{{ m.type }}','{{ m.numero }}')">
-                                <i class="ti ti-link"></i> Copier
-                            </button>
-                        </td>
+                        <td><button class="btn btn-outline btn-sm" onclick="copyLink(this,'{{ m.type }}','{{ m.numero }}')"><i class="ti ti-link"></i> Copier</button></td>
                         <td>
                             <div class="actions">
                                 <a href="{{ url_for('admin_history', mannequin_id=m.id) }}" class="btn btn-outline btn-sm" data-c="blue"><i class="ti ti-history"></i></a>
                                 <a href="{{ url_for('admin_export_mannequin', mannequin_id=m.id) }}" class="btn btn-outline btn-sm" data-c="green"><i class="ti ti-file-spreadsheet"></i></a>
-                                <form method="POST" action="{{ url_for('admin_delete_mannequin', mannequin_id=m.id) }}"
-                                      style="display:inline;" onsubmit="return confirm('Supprimer ce mannequin et tout son historique ?')">
+                                <form method="POST" action="{{ url_for('admin_delete_mannequin', mannequin_id=m.id) }}" style="display:inline;" onsubmit="return confirm('Supprimer ce mannequin et tout son historique ?')">
                                     <button class="btn btn-outline btn-sm" data-c="red"><i class="ti ti-trash"></i></button>
                                 </form>
                             </div>
@@ -64,7 +48,7 @@
             </table>
         </div>
         {% else %}
-        <p style="color:var(--gray-400); font-size:0.9rem;">Aucun mannequin enregistré.</p>
+        <p style="color:var(--g400); font-size:0.9rem;">Aucun mannequin enregistré.</p>
         {% endif %}
     </div>
 
@@ -74,41 +58,23 @@
         {% if recent %}
         <div class="table-wrap">
             <table>
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Mannequin</th>
-                        <th>Par</th>
-                        <th class="tc">Nett.</th>
-                        <th class="tc">Poumons</th>
-                        <th class="tc">Répar.</th>
-                    </tr>
-                </thead>
+                <thead><tr><th>Date</th><th>Mannequin</th><th>Par</th><th class="tc">Nett.</th><th class="tc">Poumons</th><th class="tc">Répar.</th></tr></thead>
                 <tbody>
                     {% for i in recent %}
                     <tr>
                         <td>{{ i.date }}</td>
                         <td><span class="badge badge-{{ i.m_type|lower }}">{{ i.m_type }}</span> N°{{ i.m_numero }}</td>
                         <td>{{ i.prenom }} {{ i.nom }}</td>
-                        <td class="tc">
-                            {% if i.nettoyage %}<i class="ti ti-circle-check-filled st-yes"></i>
-                            {% else %}<i class="ti ti-circle-minus st-no"></i>{% endif %}
-                        </td>
-                        <td class="tc">
-                            {% if i.changement_poumons %}<i class="ti ti-circle-check-filled st-yes"></i>
-                            {% else %}<i class="ti ti-circle-minus st-no"></i>{% endif %}
-                        </td>
-                        <td class="tc">
-                            {% if i.reparation %}<i class="ti ti-alert-circle-filled st-warn"></i>
-                            {% else %}<i class="ti ti-circle-check-filled st-ok"></i>{% endif %}
-                        </td>
+                        <td class="tc">{% if i.nettoyage %}<i class="ti ti-circle-check-filled st-yes"></i>{% else %}<i class="ti ti-circle-minus st-no"></i>{% endif %}</td>
+                        <td class="tc">{% if i.changement_poumons %}<i class="ti ti-circle-check-filled st-yes"></i>{% else %}<i class="ti ti-circle-minus st-no"></i>{% endif %}</td>
+                        <td class="tc">{% if i.reparation %}<i class="ti ti-alert-circle-filled st-warn"></i>{% else %}<i class="ti ti-circle-check-filled st-ok"></i>{% endif %}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
         {% else %}
-        <p style="color:var(--gray-400); font-size:0.9rem;">Aucune intervention enregistrée.</p>
+        <p style="color:var(--g400); font-size:0.9rem;">Aucune intervention enregistrée.</p>
         {% endif %}
     </div>
 </div>
