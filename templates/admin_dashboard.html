@@ -89,7 +89,7 @@
 {% block scripts %}
 <script>
 function copyLink(btn, type, numero) {
-    const url = location.origin + '/formulaire?type=' + encodeURIComponent(type) + '&numero=' + encodeURIComponent(numero);
+    const url = location.origin + '{{ url_for("formulaire") }}' + '?type=' + encodeURIComponent(type) + '&numero=' + encodeURIComponent(numero);
     navigator.clipboard.writeText(url).then(() => {
         const orig = btn.innerHTML;
         btn.innerHTML = '<i class="ti ti-check"></i> Copié';
