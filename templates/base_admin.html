@@ -9,20 +9,18 @@
     <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
     {% block head %}{% endblock %}
 </head>
-<body class="bg-light">
-    <nav class="navbar navbar-dark bg-dark px-3">
-        <div class="container-fluid">
-            <a class="navbar-brand d-flex align-items-center gap-3" href="{{ url_for('admin_dashboard') }}">
-                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="ALUPS" class="admin-logo">
-                <span class="fw-semibold">Administration</span>
-            </a>
-            <a href="{{ url_for('admin_logout') }}" class="btn btn-outline-light btn-sm">
-                <i class="bi bi-box-arrow-right"></i> Déconnexion
-            </a>
-        </div>
+<body>
+    <nav class="admin-nav d-flex align-items-center justify-content-between">
+        <a href="{{ url_for('admin_dashboard') }}" class="d-flex align-items-center text-decoration-none">
+            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="ALUPS" class="admin-logo">
+            <span class="nav-title">Administration</span>
+        </a>
+        <a href="{{ url_for('admin_logout') }}" class="btn btn-sm btn-outline-secondary btn-logout">
+            <i class="bi bi-box-arrow-right"></i> Déconnexion
+        </a>
     </nav>
 
-    <main class="container-fluid py-4 px-4">
+    <main class="container-fluid py-4 px-3 px-lg-4">
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             {% for category, message in messages %}

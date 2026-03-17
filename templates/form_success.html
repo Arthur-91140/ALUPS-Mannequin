@@ -2,17 +2,17 @@
 {% block title %}Formulaire envoyé{% endblock %}
 
 {% block content %}
-<div class="success-card card shadow-sm">
-    <div class="card-body py-5">
+<div class="success-card card">
+    <div class="card-body py-5 px-4">
         <div class="success-icon mb-3">
             <i class="bi bi-check-circle-fill"></i>
         </div>
-        <h2 class="h4 mb-3">Formulaire enregistré</h2>
-        <p class="text-muted mb-4">
+        <h2 class="h5 fw-semibold mb-2">Formulaire enregistré</h2>
+        <p class="text-muted mb-4" style="font-size:0.925rem;">
             Les informations ont bien été enregistrées.<br>
             Merci pour votre suivi.
         </p>
-        <a href="{{ url_for('formulaire') }}" class="btn btn-primary">
+        <a href="{{ url_for('formulaire') }}" class="btn btn-primary" style="border-radius:10px;">
             <i class="bi bi-plus-circle"></i> Nouveau formulaire
         </a>
     </div>

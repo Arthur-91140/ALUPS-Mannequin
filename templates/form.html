@@ -3,7 +3,7 @@
 
 {% block content %}
 <div class="form-card">
-    <div class="card shadow-sm">
+    <div class="card">
         <div class="card-header">
             <i class="bi bi-clipboard2-pulse"></i> Suivi des mannequins
         </div>
@@ -11,46 +11,46 @@
             <form method="POST" action="{{ url_for('formulaire') }}" id="mainForm">
 
                 <!-- Mannequin selection -->
-                <fieldset class="mb-3">
-                    <legend class="fs-6 fw-semibold mb-2">Mannequin <span class="required-star">*</span></legend>
+                <p class="form-section-title">Mannequin</p>
 
-                    <div class="mb-2">
-                        <label for="type_select" class="form-label small">Type</label>
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <label for="type_select" class="form-label">Type <span class="required-star">*</span></label>
                         <select class="form-select" id="type_select" name="type_select" required>
-                            <option value="">— Sélectionnez un type —</option>
+                            <option value="">Sélectionnez</option>
                             {% for t in types %}
                             <option value="{{ t }}" {% if pre_type == t %}selected{% endif %}>{{ t }}</option>
                             {% endfor %}
                         </select>
                     </div>
-
-                    <div class="mb-2">
-                        <label for="numero_select" class="form-label small">Numéro</label>
+                    <div class="col-6">
+                        <label for="numero_select" class="form-label">Numéro <span class="required-star">*</span></label>
                         <select class="form-select" id="numero_select" name="numero_select" required>
-                            <option value="">— Sélectionnez d'abord un type —</option>
+                            <option value="">Type d'abord</option>
                         </select>
                         <input type="hidden" name="mannequin_id" id="mannequin_id" value="{{ pre_mannequin_id or '' }}">
                     </div>
-                </fieldset>
+                </div>
 
                 <hr>
 
-                <!-- Date -->
+                <!-- Identity -->
+                <p class="form-section-title">Intervenant</p>
+
                 <div class="mb-3">
-                    <label for="date" class="form-label fw-semibold">Date <span class="required-star">*</span></label>
+                    <label for="date" class="form-label">Date <span class="required-star">*</span></label>
                     <input type="date" class="form-control" id="date" name="date"
                            value="{{ form_data.date if form_data else today }}" required>
                 </div>
 
-                <!-- Prénom / Nom -->
                 <div class="row g-2 mb-3">
                     <div class="col-6">
-                        <label for="prenom" class="form-label fw-semibold">Prénom <span class="required-star">*</span></label>
+                        <label for="prenom" class="form-label">Prénom <span class="required-star">*</span></label>
                         <input type="text" class="form-control" id="prenom" name="prenom"
                                value="{{ form_data.prenom if form_data else '' }}" required>
                     </div>
                     <div class="col-6">
-                        <label for="nom" class="form-label fw-semibold">Nom <span class="required-star">*</span></label>
+                        <label for="nom" class="form-label">Nom <span class="required-star">*</span></label>
                         <input type="text" class="form-control" id="nom" name="nom"
                                value="{{ form_data.nom if form_data else '' }}" required>
                     </div>
@@ -58,7 +58,9 @@
 
                 <hr>
 
-                <!-- Nettoyage -->
+                <!-- Actions -->
+                <p class="form-section-title">Actions réalisées</p>
+
                 <div class="question-row">
                     <span class="question-label">Nettoyage effectué ? <span class="required-star">*</span></span>
                     <div class="toggle-group">
@@ -71,7 +73,6 @@
                     </div>
                 </div>
 
-                <!-- Changement des poumons -->
                 <div class="question-row">
                     <span class="question-label">Changement des poumons ? <span class="required-star">*</span></span>
                     <div class="toggle-group">
@@ -84,7 +85,6 @@
                     </div>
                 </div>
 
-                <!-- Réparation -->
                 <div class="question-row">
                     <span class="question-label">Réparation effectuée ? <span class="required-star">*</span></span>
                     <div class="toggle-group">
@@ -101,28 +101,29 @@
 
                 <!-- Informations -->
                 <div class="mb-3">
-                    <label for="informations" class="form-label fw-semibold">Informations à communiquer</label>
+                    <label for="informations" class="form-label">Informations à communiquer</label>
                     <textarea class="form-control" id="informations" name="informations" rows="3"
                               placeholder="Remarques, problèmes constatés...">{{ form_data.informations if form_data else '' }}</textarea>
                 </div>
 
                 <!-- Signature -->
                 <div class="mb-4">
-                    <label class="form-label fw-semibold">Signature <span class="required-star">*</span></label>
+                    <label class="form-label">Signature <span class="required-star">*</span></label>
                     <div class="signature-wrapper">
-                        <button type="button" class="btn btn-sm btn-outline-secondary btn-clear-sig" id="clearSig">
+                        <button type="button" class="btn btn-clear-sig" id="clearSig">
                             <i class="bi bi-eraser"></i> Effacer
                         </button>
                         <canvas id="signatureCanvas"></canvas>
                     </div>
-                    <input type="hidden" name="signature" id="signatureData">
-                    <div class="form-text">Signez avec votre doigt ou votre souris.</div>
+                    <div class="form-text text-muted" style="font-size:0.8rem; margin-top:0.35rem;">
+                        Signez avec votre doigt ou votre souris.
+                    </div>
                 </div>
 
                 <!-- Submit -->
                 <div class="d-grid">
-                    <button type="submit" class="btn btn-lg btn-success btn-submit" id="submitBtn">
-                        <i class="bi bi-check-circle"></i> Valider
+                    <button type="submit" class="btn btn-primary btn-lg btn-submit" id="submitBtn">
+                        <i class="bi bi-check2"></i> Valider
                     </button>
                 </div>
             </form>
@@ -135,7 +136,6 @@
 <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.2.0/dist/signature_pad.umd.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // ── Mannequin data ──
     const mannequins = {{ mannequins | tojson }};
     const typeSelect = document.getElementById('type_select');
     const numeroSelect = document.getElementById('numero_select');
@@ -146,11 +146,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function updateNumeros() {
         const selectedType = typeSelect.value;
-        numeroSelect.innerHTML = '<option value="">— Sélectionnez un numéro —</option>';
+        numeroSelect.innerHTML = '<option value="">Sélectionnez</option>';
         mannequinIdInput.value = '';
 
         if (!selectedType) {
-            numeroSelect.innerHTML = '<option value="">— Sélectionnez d\'abord un type —</option>';
+            numeroSelect.innerHTML = '<option value="">Type d\'abord</option>';
             return;
         }
 
@@ -164,7 +164,7 @@ document.addEventListener('DOMContentLoaded', function() {
         filtered.forEach(m => {
             const opt = document.createElement('option');
             opt.value = m.numero;
-            opt.textContent = 'N°' + m.numero;
+            opt.textContent = 'N\u00b0' + m.numero;
             opt.dataset.id = m.id;
             if (m.id == preMannequinId || (preType === selectedType && preNumero === m.numero)) {
                 opt.selected = true;
@@ -174,27 +174,23 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         if (filtered.length === 0) {
-            numeroSelect.innerHTML = '<option value="">Aucun mannequin de ce type</option>';
+            numeroSelect.innerHTML = '<option value="">Aucun mannequin</option>';
         }
     }
 
     typeSelect.addEventListener('change', updateNumeros);
-
     numeroSelect.addEventListener('change', function() {
         const selected = this.options[this.selectedIndex];
         mannequinIdInput.value = selected.dataset.id || '';
     });
 
-    // Init if pre-selected
-    if (preType) {
-        updateNumeros();
-    }
+    if (preType) updateNumeros();
 
-    // ── Signature pad ──
+    // Signature
     const canvas = document.getElementById('signatureCanvas');
     const signaturePad = new SignaturePad(canvas, {
         backgroundColor: 'rgba(255, 255, 255, 0)',
-        penColor: '#1a1a2e'
+        penColor: '#1e293b'
     });
 
     function resizeCanvas() {
@@ -209,11 +205,8 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    document.getElementById('clearSig').addEventListener('click', function() {
-        signaturePad.clear();
-    });
+    document.getElementById('clearSig').addEventListener('click', () => signaturePad.clear());
 
-    // ── Form submission ──
     document.getElementById('mainForm').addEventListener('submit', function(e) {
         if (signaturePad.isEmpty()) {
             e.preventDefault();

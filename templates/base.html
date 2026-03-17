@@ -9,22 +9,22 @@
     <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
     {% block head %}{% endblock %}
 </head>
-<body class="{% block body_class %}bg-light{% endblock %}">
-    <header class="bg-white border-bottom py-2 px-3 mb-4">
-        <div class="container-fluid">
-            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="ALUPS" class="header-logo">
-        </div>
+<body>
+    <header class="site-header">
+        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="ALUPS" class="header-logo">
     </header>
 
-    <main class="container-fluid px-3 pb-5">
+    <main class="px-3 py-4">
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
+        <div class="form-card">
             {% for category, message in messages %}
-            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            <div class="alert alert-{{ category }} alert-dismissible fade show mb-3" role="alert">
                 {{ message }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
             {% endfor %}
+        </div>
         {% endif %}
         {% endwith %}
 
