@@ -8,7 +8,7 @@
             <i class="ti ti-clipboard-heart"></i> Suivi des mannequins
         </div>
         <div class="card-body">
-            <form method="POST" action="{{ url_for('formulaire') }}" id="mainForm">
+            <form method="POST" action="{{ url_for('formulaire') }}" id="mainForm" enctype="multipart/form-data">
 
                 <p class="fsec"><i class="ti ti-first-aid-kit"></i> Mannequin</p>
                 <div class="fgrid">
@@ -98,6 +98,17 @@
                 </div>
 
                 <div class="field">
+                    <label class="label">Photos</label>
+                    <label class="file-upload" id="fileUploadLabel">
+                        <input type="file" name="photos" multiple accept="image/*" id="photoInput">
+                        <i class="ti ti-camera"></i>
+                        <span id="fileUploadText">Ajouter des photos</span>
+                    </label>
+                    <div id="photoPreview" class="photo-preview"></div>
+                    <p class="sig-hint">Optionnel — appuyez pour prendre ou choisir des photos.</p>
+                </div>
+
+                <div class="field">
                     <label class="label">Signature <span class="req">*</span></label>
                     <div class="sig-box">
                         <button type="button" class="sig-clear" id="clearSig">
@@ -164,6 +175,27 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('mainForm').addEventListener('submit', function(e) {
         if (pad.isEmpty()) { e.preventDefault(); alert('Veuillez signer le formulaire.'); return; }
         document.getElementById('signatureData').value = pad.toDataURL('image/png');
+    });
+
+    // Photo preview
+    document.getElementById('photoInput').addEventListener('change', function() {
+        const preview = document.getElementById('photoPreview');
+        const text = document.getElementById('fileUploadText');
+        preview.innerHTML = '';
+        if (this.files.length > 0) {
+            text.textContent = this.files.length + ' photo' + (this.files.length > 1 ? 's' : '') + ' sélectionnée' + (this.files.length > 1 ? 's' : '');
+            Array.from(this.files).forEach(f => {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    preview.appendChild(img);
+                };
+                reader.readAsDataURL(f);
+            });
+        } else {
+            text.textContent = 'Ajouter des photos';
+        }
     });
 });
 </script>

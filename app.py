@@ -23,10 +23,14 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_prefix=1)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, 'data')
 SIGNATURES_DIR = os.path.join(DATA_DIR, 'signatures')
+PHOTOS_DIR = os.path.join(DATA_DIR, 'photos')
 DB_PATH = os.path.join(DATA_DIR, 'mannequins.db')
 SECRET_KEY_FILE = os.path.join(DATA_DIR, '.secret_key')
 
 os.makedirs(SIGNATURES_DIR, exist_ok=True)
+os.makedirs(PHOTOS_DIR, exist_ok=True)
+
+ALLOWED_PHOTO_EXT = {'.jpg', '.jpeg', '.png', '.gif', '.webp'}
 
 # Persistent secret key
 if os.path.exists(SECRET_KEY_FILE):
@@ -77,6 +81,14 @@ def init_db():
             signature_path TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (mannequin_id) REFERENCES mannequins(id) ON DELETE CASCADE
+        );
+        CREATE TABLE IF NOT EXISTS photos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            intervention_id INTEGER NOT NULL,
+            filename TEXT NOT NULL,
+            original_name TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (intervention_id) REFERENCES interventions(id) ON DELETE CASCADE
         );
     ''')
     conn.commit()
@@ -203,7 +215,7 @@ def formulaire_submit():
 
     # Save to DB
     conn = get_db()
-    conn.execute(
+    cursor = conn.execute(
         '''INSERT INTO interventions
            (mannequin_id, date, prenom, nom, nettoyage, changement_poumons,
             reparation, informations, signature_path)
@@ -216,6 +228,21 @@ def formulaire_submit():
             informations, signature_path
         )
     )
+    intervention_id = cursor.lastrowid
+
+    # Save photos
+    photos = request.files.getlist('photos')
+    for photo in photos:
+        if photo and photo.filename:
+            ext = os.path.splitext(photo.filename)[1].lower()
+            if ext in ALLOWED_PHOTO_EXT:
+                fname = f"{uuid.uuid4().hex}{ext}"
+                photo.save(os.path.join(PHOTOS_DIR, fname))
+                conn.execute(
+                    'INSERT INTO photos (intervention_id, filename, original_name) VALUES (?, ?, ?)',
+                    (intervention_id, fname, photo.filename)
+                )
+
     conn.commit()
     conn.close()
 
@@ -416,14 +443,21 @@ def admin_add_mannequin():
 @admin_required
 def admin_delete_mannequin(mannequin_id):
     conn = get_db()
-    # Delete associated signature files
+    # Delete associated signature files and photos
     interventions = conn.execute(
-        'SELECT signature_path FROM interventions WHERE mannequin_id = ?',
+        'SELECT id, signature_path FROM interventions WHERE mannequin_id = ?',
         (mannequin_id,)
     ).fetchall()
     for inter in interventions:
         if inter['signature_path']:
             path = os.path.join(SIGNATURES_DIR, inter['signature_path'])
+            if os.path.exists(path):
+                os.remove(path)
+        inter_photos = conn.execute(
+            'SELECT filename FROM photos WHERE intervention_id = ?', (inter['id'],)
+        ).fetchall()
+        for p in inter_photos:
+            path = os.path.join(PHOTOS_DIR, p['filename'])
             if os.path.exists(path):
                 os.remove(path)
 
@@ -452,12 +486,29 @@ def admin_history(mannequin_id):
         WHERE mannequin_id = ?
         ORDER BY date DESC, created_at DESC
     ''', (mannequin_id,)).fetchall()
+
+    # Load photos grouped by intervention
+    intervention_ids = [i['id'] for i in interventions]
+    photos_by_intervention = {}
+    if intervention_ids:
+        placeholders = ','.join('?' * len(intervention_ids))
+        photos = conn.execute(
+            f'SELECT * FROM photos WHERE intervention_id IN ({placeholders}) ORDER BY id',
+            intervention_ids
+        ).fetchall()
+        for p in photos:
+            iid = p['intervention_id']
+            if iid not in photos_by_intervention:
+                photos_by_intervention[iid] = []
+            photos_by_intervention[iid].append(dict(p))
+
     conn.close()
 
     return render_template(
         'admin_history.html',
         mannequin=mannequin,
-        interventions=interventions
+        interventions=interventions,
+        photos_by_intervention=photos_by_intervention
     )
 
 
@@ -472,6 +523,14 @@ def admin_delete_intervention(intervention_id):
     if inter:
         if inter['signature_path']:
             path = os.path.join(SIGNATURES_DIR, inter['signature_path'])
+            if os.path.exists(path):
+                os.remove(path)
+        # Delete associated photos from disk
+        inter_photos = conn.execute(
+            'SELECT filename FROM photos WHERE intervention_id = ?', (intervention_id,)
+        ).fetchall()
+        for p in inter_photos:
+            path = os.path.join(PHOTOS_DIR, p['filename'])
             if os.path.exists(path):
                 os.remove(path)
         conn.execute('DELETE FROM interventions WHERE id = ?', (intervention_id,))
@@ -783,6 +842,12 @@ def admin_export_mannequin(mannequin_id):
 @admin_required
 def serve_signature(filename):
     return send_file(os.path.join(SIGNATURES_DIR, filename))
+
+
+@app.route('/photos/<filename>')
+@admin_required
+def serve_photo(filename):
+    return send_file(os.path.join(PHOTOS_DIR, filename))
 
 
 # ── Init & run ────────────────────────────────────────────

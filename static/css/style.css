@@ -493,6 +493,72 @@ tbody tr:last-child td { border-bottom: none; }
 
 .sig-hint { font-size: 0.75rem; color: var(--g400); margin-top: 0.35rem; font-style: italic; }
 
+/* ── File upload ───────────────────────────────────── */
+
+.file-upload {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border: 2px dashed var(--g200);
+    border-radius: var(--radius-sm);
+    background: var(--g50);
+    cursor: pointer;
+    transition: all 0.2s var(--ease);
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--g500);
+}
+
+.file-upload:hover { border-color: var(--blue-100); color: var(--blue); background: var(--blue-50); }
+.file-upload input[type="file"] { display: none; }
+.file-upload i { font-size: 1.2rem; }
+
+.photo-preview {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: 0.5rem;
+}
+
+.photo-preview img {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: var(--radius-xs);
+    border: 1px solid var(--g200);
+}
+
+/* ── Photos in history ─────────────────────────────── */
+
+.photo-gallery {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    margin-top: 0.35rem;
+}
+
+.photo-gallery a {
+    display: block;
+    border-radius: var(--radius-xs);
+    overflow: hidden;
+    border: 1px solid var(--g200);
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.photo-gallery a:hover {
+    transform: scale(1.05);
+    box-shadow: var(--shadow);
+}
+
+.photo-gallery img {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    display: block;
+}
+
 /* ── Submit ────────────────────────────────────────── */
 
 .btn-submit {

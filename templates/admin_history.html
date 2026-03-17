@@ -16,7 +16,7 @@
     {% if interventions %}
     <div class="table-wrap">
         <table>
-            <thead><tr><th>Date</th><th>Prénom</th><th>Nom</th><th class="tc">Nettoyage</th><th class="tc">Poumons</th><th class="tc">Réparation</th><th>Informations</th><th>Signature</th><th class="tr">Actions</th></tr></thead>
+            <thead><tr><th>Date</th><th>Prénom</th><th>Nom</th><th class="tc">Nettoyage</th><th class="tc">Poumons</th><th class="tc">Réparation</th><th>Informations</th><th>Photos</th><th>Signature</th><th class="tr">Actions</th></tr></thead>
             <tbody>
                 {% for i in interventions %}
                 <tr>
@@ -27,6 +27,18 @@
                     <td class="tc">{% if i.changement_poumons %}<i class="ti ti-circle-check st-yes"></i>{% else %}<i class="ti ti-circle-x st-no"></i>{% endif %}</td>
                     <td class="tc">{% if i.reparation %}<i class="ti ti-circle-check st-ok"></i>{% else %}<i class="ti ti-alert-triangle st-warn"></i>{% endif %}</td>
                     <td>{{ i.informations or '—' }}</td>
+                    <td>
+                        {% set iphotos = photos_by_intervention.get(i.id, []) %}
+                        {% if iphotos %}
+                        <div class="photo-gallery">
+                            {% for p in iphotos %}
+                            <a href="{{ url_for('serve_photo', filename=p.filename) }}" target="_blank" title="{{ p.original_name }}">
+                                <img src="{{ url_for('serve_photo', filename=p.filename) }}" alt="{{ p.original_name }}">
+                            </a>
+                            {% endfor %}
+                        </div>
+                        {% else %}<span class="st-no">—</span>{% endif %}
+                    </td>
                     <td>{% if i.signature_path %}<img src="{{ url_for('serve_signature', filename=i.signature_path) }}" alt="Signature" class="sig-thumb">{% else %}<span class="st-no">—</span>{% endif %}</td>
                     <td><div class="actions"><form method="POST" action="{{ url_for('admin_delete_intervention', intervention_id=i.id) }}" style="display:inline;" onsubmit="return confirm('Supprimer cette intervention ?')"><button class="btn btn-outline btn-sm" data-c="red"><i class="ti ti-trash"></i></button></form></div></td>
                 </tr>
