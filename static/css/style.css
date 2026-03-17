@@ -37,7 +37,7 @@ body { background: #f2f4f7; }
 }
 
 .site-header img {
-    height: 44px;
+    height: 64px;
     display: block;
 }
 
@@ -285,7 +285,7 @@ body { background: #f2f4f7; }
 }
 
 .admin-nav a { text-decoration: none; }
-.admin-nav img { height: 32px; display: block; }
+.admin-nav img { height: 48px; display: block; }
 
 .admin-nav-brand {
     display: flex;
