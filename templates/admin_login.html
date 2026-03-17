@@ -3,19 +3,21 @@
 
 {% block content %}
 <div class="auth-page">
-    <div class="auth-box">
-        <article>
-            <header><i class="ti ti-shield-lock"></i> Connexion administrateur</header>
+    <div class="auth-card form-card">
+        <div class="form-card-header">
+            <i class="ti ti-shield-lock"></i> Connexion administrateur
+        </div>
+        <div class="form-card-body">
             <form method="POST">
-                <label>
-                    Mot de passe
-                    <input type="password" name="password" required autofocus>
-                </label>
-                <button type="submit">
+                <div class="field">
+                    <label class="label">Mot de passe</label>
+                    <input type="password" class="input" name="password" required autofocus>
+                </div>
+                <button type="submit" class="btn-submit">
                     <i class="ti ti-login"></i> Se connecter
                 </button>
             </form>
-        </article>
+        </div>
     </div>
 </div>
 {% endblock %}

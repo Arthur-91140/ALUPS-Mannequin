@@ -2,18 +2,16 @@
 {% block title %}Formulaire envoyé{% endblock %}
 
 {% block content %}
-<div class="success-wrap">
-    <article>
-        <div class="success-icon">
+<div class="success-page">
+    <div class="success-card">
+        <div class="success-ring">
             <i class="ti ti-check"></i>
         </div>
-        <hgroup>
-            <h2>Formulaire enregistré</h2>
-            <p>Les informations ont bien été enregistrées. Merci pour votre suivi.</p>
-        </hgroup>
-        <a href="{{ url_for('formulaire') }}" role="button">
+        <h2>Formulaire enregistré</h2>
+        <p>Les informations ont bien été enregistrées.<br>Merci pour votre suivi.</p>
+        <a href="{{ url_for('formulaire') }}" class="btn btn-primary">
             <i class="ti ti-plus"></i> Nouveau formulaire
         </a>
-    </article>
+    </div>
 </div>
 {% endblock %}

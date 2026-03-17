@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<html lang="fr" data-theme="light">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Administration{% endblock %} — ALUPS</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3/dist/tabler-icons.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     {% block head %}{% endblock %}
@@ -15,7 +14,7 @@
             <img src="{{ url_for('static', filename='img/logo.png') }}" alt="ALUPS">
             <span class="admin-nav-title">Administration</span>
         </a>
-        <a href="{{ url_for('admin_logout') }}" role="button" class="outline btn-logout">
+        <a href="{{ url_for('admin_logout') }}" class="btn btn-outline btn-sm btn-logout">
             <i class="ti ti-logout"></i> Déconnexion
         </a>
     </nav>
@@ -24,11 +23,7 @@
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             {% for category, message in messages %}
-            <div style="padding:0.65rem 0.9rem; border-radius:8px; font-size:0.9rem; margin-bottom:0.75rem;
-                {% if category == 'danger' %}background:#fef2f2; color:#b91c1c; border:1px solid #fecaca;
-                {% elif category == 'success' %}background:#f0fdf4; color:#166534; border:1px solid #bbf7d0;{% endif %}">
-                {{ message }}
-            </div>
+            <div class="alert alert-{{ category }}">{{ message }}</div>
             {% endfor %}
         {% endif %}
         {% endwith %}
