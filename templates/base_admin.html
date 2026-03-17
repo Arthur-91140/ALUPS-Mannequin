@@ -26,7 +26,7 @@
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             {% for category, message in messages %}
-            <div class="alert alert-{{ category }}">{{ message }}</div>
+            <div class="alert alert-{{ category }}"><i class="ti ti-{% if category == 'danger' %}alert-circle{% else %}circle-check{% endif %}"></i> {{ message }}</div>
             {% endfor %}
         {% endif %}
         {% endwith %}

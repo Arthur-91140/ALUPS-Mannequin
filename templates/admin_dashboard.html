@@ -48,7 +48,10 @@
             </table>
         </div>
         {% else %}
-        <p style="color:var(--g400); font-size:0.9rem;">Aucun mannequin enregistré.</p>
+        <div class="empty-state">
+            <i class="ti ti-box-off"></i>
+            Aucun mannequin enregistré.
+        </div>
         {% endif %}
     </div>
 
@@ -74,7 +77,10 @@
             </table>
         </div>
         {% else %}
-        <p style="color:var(--g400); font-size:0.9rem;">Aucune intervention enregistrée.</p>
+        <div class="empty-state">
+            <i class="ti ti-clipboard-off"></i>
+            Aucune intervention enregistrée.
+        </div>
         {% endif %}
     </div>
 </div>
@@ -87,8 +93,9 @@ function copyLink(btn, type, numero) {
     navigator.clipboard.writeText(url).then(() => {
         const orig = btn.innerHTML;
         btn.innerHTML = '<i class="ti ti-check"></i> Copié';
-        btn.style.cssText = 'border-color:var(--green);color:var(--green);';
-        setTimeout(() => { btn.innerHTML = orig; btn.style.cssText = ''; }, 1500);
+        btn.classList.add('btn-outline');
+        btn.setAttribute('data-c', 'green');
+        setTimeout(() => { btn.innerHTML = orig; btn.removeAttribute('data-c'); }, 1500);
     });
 }
 </script>

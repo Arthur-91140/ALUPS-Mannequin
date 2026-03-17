@@ -10,7 +10,7 @@
         <div class="card-body">
             <form method="POST" action="{{ url_for('formulaire') }}" id="mainForm">
 
-                <p class="fsec">Mannequin</p>
+                <p class="fsec"><i class="ti ti-first-aid-kit"></i> Mannequin</p>
                 <div class="fgrid">
                     <div class="field">
                         <label class="label">Type <span class="req">*</span></label>
@@ -32,7 +32,7 @@
 
                 <div class="fdiv"></div>
 
-                <p class="fsec">Intervenant</p>
+                <p class="fsec"><i class="ti ti-user"></i> Intervenant</p>
                 <div class="field">
                     <label class="label">Date <span class="req">*</span></label>
                     <input type="date" class="input" name="date" value="{{ form_data.date if form_data else today }}" required>
@@ -50,7 +50,7 @@
 
                 <div class="fdiv"></div>
 
-                <p class="fsec">Actions réalisées</p>
+                <p class="fsec"><i class="ti ti-checklist"></i> Actions réalisées</p>
 
                 <div class="question">
                     <span class="question-text">Nettoyage effectué ? <span class="req">*</span></span>
@@ -90,6 +90,7 @@
 
                 <div class="fdiv"></div>
 
+                <p class="fsec"><i class="ti ti-message-dots"></i> Commentaires</p>
                 <div class="field">
                     <label class="label">Informations à communiquer</label>
                     <textarea class="textarea" name="informations" rows="3"
@@ -109,7 +110,7 @@
                 </div>
 
                 <button type="submit" class="btn-submit" id="submitBtn">
-                    <i class="ti ti-check"></i> Valider
+                    <i class="ti ti-check"></i> Valider le formulaire
                 </button>
             </form>
         </div>
