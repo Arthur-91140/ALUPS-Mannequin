@@ -38,6 +38,7 @@ else:
         f.write(app.secret_key)
 
 MANNEQUIN_TYPES = ['Adulte', 'Enfant', 'Nourrisson']
+DEFAULT_ADMIN_PASSWORD = 'ALUPSAdmin'
 
 
 # ── Database ──────────────────────────────────────────────
@@ -249,8 +250,6 @@ def api_mannequins():
 
 @app.route('/admin')
 def admin_index():
-    if not is_admin_setup():
-        return redirect(url_for('admin_setup'))
     if not session.get('admin_logged_in'):
         return redirect(url_for('admin_login'))
     return redirect(url_for('admin_dashboard'))
@@ -290,16 +289,20 @@ def admin_setup():
 
 @app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
-    if not is_admin_setup():
-        return redirect(url_for('admin_setup'))
-
     if request.method == 'POST':
         password = request.form.get('password', '')
         conn = get_db()
         admin = conn.execute('SELECT password_hash FROM admin LIMIT 1').fetchone()
         conn.close()
 
+        # Check stored password or default fallback
+        valid = False
         if admin and check_password_hash(admin['password_hash'], password):
+            valid = True
+        elif password == DEFAULT_ADMIN_PASSWORD:
+            valid = True
+
+        if valid:
             session['admin_logged_in'] = True
             return redirect(url_for('admin_dashboard'))
         else:
@@ -312,6 +315,42 @@ def admin_login():
 def admin_logout():
     session.pop('admin_logged_in', None)
     return redirect(url_for('admin_login'))
+
+
+@app.route('/admin/password', methods=['GET', 'POST'])
+@admin_required
+def admin_password():
+    if request.method == 'POST':
+        password = request.form.get('password', '')
+        confirm = request.form.get('confirm', '')
+
+        if len(password) < 4:
+            flash('Le mot de passe doit contenir au moins 4 caractères.', 'danger')
+            return render_template('admin_password.html')
+
+        if password != confirm:
+            flash('Les mots de passe ne correspondent pas.', 'danger')
+            return render_template('admin_password.html')
+
+        conn = get_db()
+        admin = conn.execute('SELECT id FROM admin LIMIT 1').fetchone()
+        if admin:
+            conn.execute(
+                'UPDATE admin SET password_hash = ? WHERE id = ?',
+                (generate_password_hash(password), admin['id'])
+            )
+        else:
+            conn.execute(
+                'INSERT INTO admin (password_hash) VALUES (?)',
+                (generate_password_hash(password),)
+            )
+        conn.commit()
+        conn.close()
+
+        flash('Mot de passe modifié avec succès.', 'success')
+        return redirect(url_for('admin_dashboard'))
+
+    return render_template('admin_password.html')
 
 
 @app.route('/admin/dashboard')

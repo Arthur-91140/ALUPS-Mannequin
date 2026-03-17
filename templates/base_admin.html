@@ -16,6 +16,9 @@
             <span class="topbar-tag">Administration</span>
         </div>
         <div class="topbar-right">
+            <a href="{{ url_for('admin_password') }}" class="btn btn-outline btn-sm">
+                <i class="ti ti-lock"></i> Mot de passe
+            </a>
             <a href="{{ url_for('admin_logout') }}" class="btn btn-outline btn-sm">
                 <i class="ti ti-logout"></i> Déconnexion
             </a>
