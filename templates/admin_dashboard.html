@@ -2,74 +2,66 @@
 {% block title %}Tableau de bord{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h5 fw-bold mb-0">Tableau de bord</h1>
-    <a href="{{ url_for('admin_export') }}" class="btn btn-export text-white">
+<div class="admin-title-bar">
+    <h1><i class="bi bi-speedometer2"></i> Tableau de bord</h1>
+    <a href="{{ url_for('admin_export') }}" class="btn btn-green">
         <i class="bi bi-file-earmark-excel"></i> Télécharger l'Excel complet
     </a>
 </div>
 
 <div class="admin-grid">
     <!-- Mannequin management -->
-    <div class="admin-section">
-        <h2><i class="bi bi-person-standing"></i> Gestion des mannequins</h2>
+    <div class="section">
+        <div class="section-title"><i class="bi bi-person-standing"></i> Gestion des mannequins</div>
 
-        <form method="POST" action="{{ url_for('admin_add_mannequin') }}" class="d-flex gap-2 mb-3 flex-wrap">
-            <select class="form-select form-select-sm" name="type" required style="width:auto;">
+        <form method="POST" action="{{ url_for('admin_add_mannequin') }}" class="flex gap-sm items-center wrap mb-md">
+            <select class="select select-sm" name="type" required style="width:auto;">
                 <option value="">Type</option>
                 {% for t in types %}
                 <option value="{{ t }}">{{ t }}</option>
                 {% endfor %}
             </select>
-            <input type="text" class="form-control form-control-sm" name="numero"
-                   placeholder="Numéro" required style="width:90px;">
-            <button type="submit" class="btn btn-sm btn-primary" style="border-radius:8px;">
+            <input type="text" class="input input-sm" name="numero" placeholder="Numéro" required style="width:90px;">
+            <button type="submit" class="btn btn-primary btn-sm">
                 <i class="bi bi-plus-lg"></i> Ajouter
             </button>
         </form>
 
         {% if mannequins %}
-        <div class="table-responsive">
-            <table class="table table-hover mb-0">
+        <div class="table-wrap">
+            <table>
                 <thead>
                     <tr>
                         <th>Type</th>
                         <th>N°</th>
-                        <th class="text-center">Interv.</th>
+                        <th class="td-center">Interv.</th>
                         <th>Lien</th>
-                        <th class="text-end">Actions</th>
+                        <th class="td-end">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for m in mannequins %}
                     <tr>
+                        <td><span class="badge badge-{{ m.type|lower }}">{{ m.type }}</span></td>
+                        <td style="font-weight:600;">{{ m.numero }}</td>
+                        <td class="td-center"><span class="pill">{{ m.nb_interventions }}</span></td>
                         <td>
-                            <span class="badge badge-type badge-{{ m.type|lower }}">{{ m.type }}</span>
-                        </td>
-                        <td class="fw-semibold">{{ m.numero }}</td>
-                        <td class="text-center">
-                            <span class="count-pill">{{ m.nb_interventions }}</span>
-                        </td>
-                        <td>
-                            <button class="btn btn-outline-secondary btn-sm link-copy-btn"
-                                    onclick="copyLink(this, '{{ m.type }}', '{{ m.numero }}')"
-                                    title="Copier le lien">
+                            <button class="btn btn-outline btn-sm"
+                                    onclick="copyLink(this, '{{ m.type }}', '{{ m.numero }}')">
                                 <i class="bi bi-link-45deg"></i> Copier
                             </button>
                         </td>
                         <td>
-                            <div class="btn-action-group">
-                                <a href="{{ url_for('admin_history', mannequin_id=m.id) }}"
-                                   class="btn btn-sm btn-outline-primary">
+                            <div class="action-group">
+                                <a href="{{ url_for('admin_history', mannequin_id=m.id) }}" class="btn btn-outline-blue btn-sm">
                                     <i class="bi bi-clock-history"></i>
                                 </a>
-                                <a href="{{ url_for('admin_export_mannequin', mannequin_id=m.id) }}"
-                                   class="btn btn-sm btn-outline-success" title="Excel">
+                                <a href="{{ url_for('admin_export_mannequin', mannequin_id=m.id) }}" class="btn btn-outline-green btn-sm">
                                     <i class="bi bi-file-earmark-excel"></i>
                                 </a>
                                 <form method="POST" action="{{ url_for('admin_delete_mannequin', mannequin_id=m.id) }}"
-                                      class="d-inline" onsubmit="return confirm('Supprimer ce mannequin et tout son historique ?')">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                      class="inline-form" onsubmit="return confirm('Supprimer ce mannequin et tout son historique ?')">
+                                    <button type="submit" class="btn btn-outline-red btn-sm">
                                         <i class="bi bi-trash3"></i>
                                     </button>
                                 </form>
@@ -81,25 +73,25 @@
             </table>
         </div>
         {% else %}
-        <p class="text-muted mb-0" style="font-size:0.9rem;">Aucun mannequin enregistré.</p>
+        <p style="color:var(--text-muted); font-size:0.9rem;">Aucun mannequin enregistré.</p>
         {% endif %}
     </div>
 
     <!-- Recent interventions -->
-    <div class="admin-section">
-        <h2><i class="bi bi-clock-history"></i> Dernières interventions</h2>
+    <div class="section">
+        <div class="section-title"><i class="bi bi-clock-history"></i> Dernières interventions</div>
 
         {% if recent %}
-        <div class="table-responsive">
-            <table class="table table-hover mb-0">
+        <div class="table-wrap">
+            <table>
                 <thead>
                     <tr>
                         <th>Date</th>
                         <th>Mannequin</th>
                         <th>Par</th>
-                        <th class="text-center">Nett.</th>
-                        <th class="text-center">Poumons</th>
-                        <th class="text-center">Répar.</th>
+                        <th class="td-center">Nett.</th>
+                        <th class="td-center">Poumons</th>
+                        <th class="td-center">Répar.</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -107,29 +99,29 @@
                     <tr>
                         <td>{{ i.date }}</td>
                         <td>
-                            <span class="badge badge-type badge-{{ i.m_type|lower }}">{{ i.m_type }}</span>
+                            <span class="badge badge-{{ i.m_type|lower }}">{{ i.m_type }}</span>
                             N°{{ i.m_numero }}
                         </td>
                         <td>{{ i.prenom }} {{ i.nom }}</td>
-                        <td class="text-center">
+                        <td class="td-center">
                             {% if i.nettoyage %}
-                                <i class="bi bi-check-circle-fill status-yes"></i>
+                                <i class="bi bi-check-circle-fill st-yes"></i>
                             {% else %}
-                                <i class="bi bi-dash-circle status-no"></i>
+                                <i class="bi bi-dash-circle st-no"></i>
                             {% endif %}
                         </td>
-                        <td class="text-center">
+                        <td class="td-center">
                             {% if i.changement_poumons %}
-                                <i class="bi bi-check-circle-fill status-yes"></i>
+                                <i class="bi bi-check-circle-fill st-yes"></i>
                             {% else %}
-                                <i class="bi bi-dash-circle status-no"></i>
+                                <i class="bi bi-dash-circle st-no"></i>
                             {% endif %}
                         </td>
-                        <td class="text-center">
+                        <td class="td-center">
                             {% if i.reparation %}
-                                <i class="bi bi-exclamation-circle-fill status-warn"></i>
+                                <i class="bi bi-exclamation-circle-fill st-warn"></i>
                             {% else %}
-                                <i class="bi bi-check-circle-fill status-ok"></i>
+                                <i class="bi bi-check-circle-fill st-ok"></i>
                             {% endif %}
                         </td>
                     </tr>
@@ -138,7 +130,7 @@
             </table>
         </div>
         {% else %}
-        <p class="text-muted mb-0" style="font-size:0.9rem;">Aucune intervention enregistrée.</p>
+        <p style="color:var(--text-muted); font-size:0.9rem;">Aucune intervention enregistrée.</p>
         {% endif %}
     </div>
 </div>
@@ -147,15 +139,13 @@
 {% block scripts %}
 <script>
 function copyLink(btn, type, numero) {
-    const url = window.location.origin + '/formulaire?type=' + encodeURIComponent(type) + '&numero=' + encodeURIComponent(numero);
+    const url = location.origin + '/formulaire?type=' + encodeURIComponent(type) + '&numero=' + encodeURIComponent(numero);
     navigator.clipboard.writeText(url).then(() => {
-        const original = btn.innerHTML;
+        const orig = btn.innerHTML;
         btn.innerHTML = '<i class="bi bi-check2"></i> Copié';
-        btn.classList.replace('btn-outline-secondary', 'btn-success');
-        setTimeout(() => {
-            btn.innerHTML = original;
-            btn.classList.replace('btn-success', 'btn-outline-secondary');
-        }, 1500);
+        btn.style.borderColor = 'var(--green)';
+        btn.style.color = 'var(--green)';
+        setTimeout(() => { btn.innerHTML = orig; btn.style.borderColor = ''; btn.style.color = ''; }, 1500);
     });
 }
 </script>

@@ -2,25 +2,24 @@
 {% block title %}Connexion admin{% endblock %}
 
 {% block content %}
-<div class="auth-wrapper">
-    <div class="auth-card">
+<div class="auth-page">
+    <div class="auth-box">
         <div class="card">
             <div class="card-header">
                 <i class="bi bi-shield-lock"></i> Connexion administrateur
             </div>
-            <div class="card-body p-4">
-                <form method="POST">
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Mot de passe</label>
-                        <input type="password" class="form-control" id="password" name="password"
-                               required autofocus>
-                    </div>
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-primary">
+            <div class="card-body">
+                <div class="form-group">
+                    <form method="POST">
+                        <div class="form-group">
+                            <label class="label">Mot de passe</label>
+                            <input type="password" class="input" name="password" required autofocus>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">
                             <i class="bi bi-box-arrow-in-right"></i> Se connecter
                         </button>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
     </div>

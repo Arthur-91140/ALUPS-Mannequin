@@ -2,7 +2,7 @@
 {% block title %}Formulaire de suivi{% endblock %}
 
 {% block content %}
-<div class="form-card">
+<div class="form-wrap">
     <div class="card">
         <div class="card-header">
             <i class="bi bi-clipboard2-pulse"></i> Suivi des mannequins
@@ -10,122 +10,110 @@
         <div class="card-body">
             <form method="POST" action="{{ url_for('formulaire') }}" id="mainForm">
 
-                <!-- Mannequin selection -->
-                <p class="form-section-title">Mannequin</p>
-
-                <div class="row g-2 mb-3">
-                    <div class="col-6">
-                        <label for="type_select" class="form-label">Type <span class="required-star">*</span></label>
-                        <select class="form-select" id="type_select" name="type_select" required>
+                <p class="form-section">Mannequin</p>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="label">Type <span class="required">*</span></label>
+                        <select class="select" id="type_select" name="type_select" required>
                             <option value="">Sélectionnez</option>
                             {% for t in types %}
                             <option value="{{ t }}" {% if pre_type == t %}selected{% endif %}>{{ t }}</option>
                             {% endfor %}
                         </select>
                     </div>
-                    <div class="col-6">
-                        <label for="numero_select" class="form-label">Numéro <span class="required-star">*</span></label>
-                        <select class="form-select" id="numero_select" name="numero_select" required>
+                    <div class="form-group">
+                        <label class="label">Numéro <span class="required">*</span></label>
+                        <select class="select" id="numero_select" name="numero_select" required>
                             <option value="">Type d'abord</option>
                         </select>
                         <input type="hidden" name="mannequin_id" id="mannequin_id" value="{{ pre_mannequin_id or '' }}">
                     </div>
                 </div>
 
-                <hr>
+                <div class="form-divider"></div>
 
-                <!-- Identity -->
-                <p class="form-section-title">Intervenant</p>
-
-                <div class="mb-3">
-                    <label for="date" class="form-label">Date <span class="required-star">*</span></label>
-                    <input type="date" class="form-control" id="date" name="date"
+                <p class="form-section">Intervenant</p>
+                <div class="form-group">
+                    <label class="label">Date <span class="required">*</span></label>
+                    <input type="date" class="input" id="date" name="date"
                            value="{{ form_data.date if form_data else today }}" required>
                 </div>
-
-                <div class="row g-2 mb-3">
-                    <div class="col-6">
-                        <label for="prenom" class="form-label">Prénom <span class="required-star">*</span></label>
-                        <input type="text" class="form-control" id="prenom" name="prenom"
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="label">Prénom <span class="required">*</span></label>
+                        <input type="text" class="input" name="prenom"
                                value="{{ form_data.prenom if form_data else '' }}" required>
                     </div>
-                    <div class="col-6">
-                        <label for="nom" class="form-label">Nom <span class="required-star">*</span></label>
-                        <input type="text" class="form-control" id="nom" name="nom"
+                    <div class="form-group">
+                        <label class="label">Nom <span class="required">*</span></label>
+                        <input type="text" class="input" name="nom"
                                value="{{ form_data.nom if form_data else '' }}" required>
                     </div>
                 </div>
 
-                <hr>
+                <div class="form-divider"></div>
 
-                <!-- Actions -->
-                <p class="form-section-title">Actions réalisées</p>
+                <p class="form-section">Actions réalisées</p>
 
-                <div class="question-row">
-                    <span class="question-label">Nettoyage effectué ? <span class="required-star">*</span></span>
-                    <div class="toggle-group">
-                        <input type="radio" class="btn-check" name="nettoyage" id="nettoyage_oui" value="oui"
+                <div class="question">
+                    <span class="question-text">Nettoyage effectué ? <span class="required">*</span></span>
+                    <div class="toggle">
+                        <input type="radio" name="nettoyage" id="nettoyage_oui" value="oui"
                                {% if form_data and form_data.nettoyage == 'oui' %}checked{% endif %} required>
-                        <label class="btn btn-oui" for="nettoyage_oui">Oui</label>
-                        <input type="radio" class="btn-check" name="nettoyage" id="nettoyage_non" value="non"
+                        <label class="t-oui" for="nettoyage_oui">Oui</label>
+                        <input type="radio" name="nettoyage" id="nettoyage_non" value="non"
                                {% if form_data and form_data.nettoyage == 'non' %}checked{% endif %}>
-                        <label class="btn btn-non" for="nettoyage_non">Non</label>
+                        <label class="t-non" for="nettoyage_non">Non</label>
                     </div>
                 </div>
 
-                <div class="question-row">
-                    <span class="question-label">Changement des poumons ? <span class="required-star">*</span></span>
-                    <div class="toggle-group">
-                        <input type="radio" class="btn-check" name="changement_poumons" id="poumons_oui" value="oui"
+                <div class="question">
+                    <span class="question-text">Changement des poumons ? <span class="required">*</span></span>
+                    <div class="toggle">
+                        <input type="radio" name="changement_poumons" id="poumons_oui" value="oui"
                                {% if form_data and form_data.changement_poumons == 'oui' %}checked{% endif %} required>
-                        <label class="btn btn-oui" for="poumons_oui">Oui</label>
-                        <input type="radio" class="btn-check" name="changement_poumons" id="poumons_non" value="non"
+                        <label class="t-oui" for="poumons_oui">Oui</label>
+                        <input type="radio" name="changement_poumons" id="poumons_non" value="non"
                                {% if form_data and form_data.changement_poumons == 'non' %}checked{% endif %}>
-                        <label class="btn btn-non" for="poumons_non">Non</label>
+                        <label class="t-non" for="poumons_non">Non</label>
                     </div>
                 </div>
 
-                <div class="question-row">
-                    <span class="question-label">Réparation effectuée ? <span class="required-star">*</span></span>
-                    <div class="toggle-group">
-                        <input type="radio" class="btn-check" name="reparation" id="reparation_oui" value="oui"
+                <div class="question">
+                    <span class="question-text">Réparation effectuée ? <span class="required">*</span></span>
+                    <div class="toggle">
+                        <input type="radio" name="reparation" id="reparation_oui" value="oui"
                                {% if form_data and form_data.reparation == 'oui' %}checked{% endif %} required>
-                        <label class="btn btn-non" for="reparation_oui">Oui</label>
-                        <input type="radio" class="btn-check" name="reparation" id="reparation_non" value="non"
+                        <label class="t-non" for="reparation_oui">Oui</label>
+                        <input type="radio" name="reparation" id="reparation_non" value="non"
                                {% if form_data and form_data.reparation == 'non' %}checked{% endif %}>
-                        <label class="btn btn-oui" for="reparation_non">Non</label>
+                        <label class="t-oui" for="reparation_non">Non</label>
                     </div>
                 </div>
 
-                <hr>
+                <div class="form-divider"></div>
 
-                <!-- Informations -->
-                <div class="mb-3">
-                    <label for="informations" class="form-label">Informations à communiquer</label>
-                    <textarea class="form-control" id="informations" name="informations" rows="3"
+                <div class="form-group">
+                    <label class="label">Informations à communiquer</label>
+                    <textarea class="textarea" name="informations" rows="3"
                               placeholder="Remarques, problèmes constatés...">{{ form_data.informations if form_data else '' }}</textarea>
                 </div>
 
-                <!-- Signature -->
-                <div class="mb-4">
-                    <label class="form-label">Signature <span class="required-star">*</span></label>
-                    <div class="signature-wrapper">
-                        <button type="button" class="btn btn-clear-sig" id="clearSig">
+                <div class="form-group">
+                    <label class="label">Signature <span class="required">*</span></label>
+                    <div class="sig-box">
+                        <button type="button" class="sig-clear" id="clearSig">
                             <i class="bi bi-eraser"></i> Effacer
                         </button>
                         <canvas id="signatureCanvas"></canvas>
                     </div>
-                    <div class="form-text text-muted" style="font-size:0.8rem; margin-top:0.35rem;">
-                        Signez avec votre doigt ou votre souris.
-                    </div>
+                    <input type="hidden" name="signature" id="signatureData">
+                    <p class="sig-hint">Signez avec votre doigt ou votre souris.</p>
                 </div>
 
-                <!-- Submit -->
-                <div class="d-grid">
-                    <button type="submit" class="btn btn-primary btn-lg btn-submit" id="submitBtn">
-                        <i class="bi bi-check2"></i> Valider
-                    </button>
-                </div>
+                <button type="submit" class="btn-submit" id="submitBtn">
+                    <i class="bi bi-check2"></i> Valider
+                </button>
             </form>
         </div>
     </div>
@@ -145,75 +133,59 @@ document.addEventListener('DOMContentLoaded', function() {
     const preMannequinId = "{{ pre_mannequin_id or '' }}";
 
     function updateNumeros() {
-        const selectedType = typeSelect.value;
+        const t = typeSelect.value;
         numeroSelect.innerHTML = '<option value="">Sélectionnez</option>';
         mannequinIdInput.value = '';
+        if (!t) { numeroSelect.innerHTML = '<option value="">Type d\'abord</option>'; return; }
 
-        if (!selectedType) {
-            numeroSelect.innerHTML = '<option value="">Type d\'abord</option>';
-            return;
-        }
-
-        const filtered = mannequins.filter(m => m.type === selectedType);
-        filtered.sort((a, b) => {
+        const list = mannequins.filter(m => m.type === t);
+        list.sort((a, b) => {
             const na = parseInt(a.numero), nb = parseInt(b.numero);
             if (!isNaN(na) && !isNaN(nb)) return na - nb;
             return a.numero.localeCompare(b.numero);
         });
 
-        filtered.forEach(m => {
-            const opt = document.createElement('option');
-            opt.value = m.numero;
-            opt.textContent = 'N\u00b0' + m.numero;
-            opt.dataset.id = m.id;
-            if (m.id == preMannequinId || (preType === selectedType && preNumero === m.numero)) {
-                opt.selected = true;
+        list.forEach(m => {
+            const o = document.createElement('option');
+            o.value = m.numero;
+            o.textContent = 'N\u00b0' + m.numero;
+            o.dataset.id = m.id;
+            if (m.id == preMannequinId || (preType === t && preNumero === m.numero)) {
+                o.selected = true;
                 mannequinIdInput.value = m.id;
             }
-            numeroSelect.appendChild(opt);
+            numeroSelect.appendChild(o);
         });
 
-        if (filtered.length === 0) {
-            numeroSelect.innerHTML = '<option value="">Aucun mannequin</option>';
-        }
+        if (!list.length) numeroSelect.innerHTML = '<option value="">Aucun mannequin</option>';
     }
 
     typeSelect.addEventListener('change', updateNumeros);
     numeroSelect.addEventListener('change', function() {
-        const selected = this.options[this.selectedIndex];
-        mannequinIdInput.value = selected.dataset.id || '';
+        mannequinIdInput.value = this.options[this.selectedIndex].dataset.id || '';
     });
-
     if (preType) updateNumeros();
 
     // Signature
     const canvas = document.getElementById('signatureCanvas');
-    const signaturePad = new SignaturePad(canvas, {
-        backgroundColor: 'rgba(255, 255, 255, 0)',
-        penColor: '#1e293b'
-    });
+    const pad = new SignaturePad(canvas, { backgroundColor: 'rgba(255,255,255,0)', penColor: '#1a1a2e' });
 
-    function resizeCanvas() {
-        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+    function resize() {
+        const r = Math.max(window.devicePixelRatio || 1, 1);
         const rect = canvas.getBoundingClientRect();
-        canvas.width = rect.width * ratio;
-        canvas.height = rect.height * ratio;
-        canvas.getContext('2d').scale(ratio, ratio);
-        signaturePad.clear();
+        canvas.width = rect.width * r;
+        canvas.height = rect.height * r;
+        canvas.getContext('2d').scale(r, r);
+        pad.clear();
     }
+    window.addEventListener('resize', resize);
+    resize();
 
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
-
-    document.getElementById('clearSig').addEventListener('click', () => signaturePad.clear());
+    document.getElementById('clearSig').addEventListener('click', () => pad.clear());
 
     document.getElementById('mainForm').addEventListener('submit', function(e) {
-        if (signaturePad.isEmpty()) {
-            e.preventDefault();
-            alert('Veuillez signer le formulaire.');
-            return;
-        }
-        document.getElementById('signatureData').value = signaturePad.toDataURL('image/png');
+        if (pad.isEmpty()) { e.preventDefault(); alert('Veuillez signer le formulaire.'); return; }
+        document.getElementById('signatureData').value = pad.toDataURL('image/png');
     });
 });
 </script>
