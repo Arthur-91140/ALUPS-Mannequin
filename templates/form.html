@@ -99,13 +99,18 @@
 
                 <div class="field">
                     <label class="label">Photos</label>
-                    <label class="file-upload" id="fileUploadLabel">
-                        <input type="file" name="photos" multiple accept="image/*" id="photoInput">
-                        <i class="ti ti-camera"></i>
-                        <span id="fileUploadText">Ajouter des photos</span>
-                    </label>
+                    <div id="photoInputs">
+                        <label class="file-upload">
+                            <input type="file" name="photos" multiple accept="image/*" class="photo-input">
+                            <i class="ti ti-camera"></i>
+                            <span>Prendre ou choisir des photos</span>
+                        </label>
+                    </div>
+                    <button type="button" class="btn btn-outline btn-sm" id="addMorePhotos" style="margin-top:0.4rem; display:none;">
+                        <i class="ti ti-plus"></i> Ajouter d'autres photos
+                    </button>
                     <div id="photoPreview" class="photo-preview"></div>
-                    <p class="sig-hint">Optionnel — appuyez pour prendre ou choisir des photos.</p>
+                    <p class="sig-hint">Optionnel — vous pouvez ajouter plusieurs photos.</p>
                 </div>
 
                 <div class="field">
@@ -177,14 +182,17 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('signatureData').value = pad.toDataURL('image/png');
     });
 
-    // Photo preview
-    document.getElementById('photoInput').addEventListener('change', function() {
-        const preview = document.getElementById('photoPreview');
-        const text = document.getElementById('fileUploadText');
+    // Photo management
+    const photoContainer = document.getElementById('photoInputs');
+    const addBtn = document.getElementById('addMorePhotos');
+    const preview = document.getElementById('photoPreview');
+
+    function refreshPreview() {
         preview.innerHTML = '';
-        if (this.files.length > 0) {
-            text.textContent = this.files.length + ' photo' + (this.files.length > 1 ? 's' : '') + ' sélectionnée' + (this.files.length > 1 ? 's' : '');
-            Array.from(this.files).forEach(f => {
+        let total = 0;
+        photoContainer.querySelectorAll('.photo-input').forEach(input => {
+            Array.from(input.files).forEach(f => {
+                total++;
                 const reader = new FileReader();
                 reader.onload = e => {
                     const img = document.createElement('img');
@@ -193,9 +201,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 };
                 reader.readAsDataURL(f);
             });
-        } else {
-            text.textContent = 'Ajouter des photos';
-        }
+        });
+        addBtn.style.display = total > 0 ? '' : 'none';
+    }
+
+    photoContainer.addEventListener('change', refreshPreview);
+
+    addBtn.addEventListener('click', function() {
+        const label = document.createElement('label');
+        label.className = 'file-upload';
+        label.style.marginTop = '0.35rem';
+        label.innerHTML = '<input type="file" name="photos" multiple accept="image/*" class="photo-input"><i class="ti ti-camera"></i><span>Photos supplémentaires</span>';
+        photoContainer.appendChild(label);
+        label.querySelector('input').click();
     });
 });
 </script>

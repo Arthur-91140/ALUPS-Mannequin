@@ -1,0 +1,92 @@
+{% extends "base_admin.html" %}
+{% block title %}Intervention du {{ inter.date }} — {{ inter.m_type }} N°{{ inter.m_numero }}{% endblock %}
+
+{% block content %}
+<div class="admin-bar">
+    <div style="display:flex; align-items:center; gap:0.75rem;">
+        <a href="{{ url_for('admin_history', mannequin_id=inter.m_id) }}" class="btn btn-outline btn-sm"><i class="ti ti-arrow-left"></i></a>
+        <h1><span class="badge badge-{{ inter.m_type|lower }}">{{ inter.m_type }}</span> N°{{ inter.m_numero }} — {{ inter.date }}</h1>
+    </div>
+    <form method="POST" action="{{ url_for('admin_delete_intervention', intervention_id=inter.id) }}" onsubmit="return confirm('Supprimer cette intervention ?')">
+        <button class="btn btn-outline btn-sm" data-c="red"><i class="ti ti-trash"></i> Supprimer</button>
+    </form>
+</div>
+
+<div class="detail-grid">
+    <div class="section">
+        <p class="section-head"><i class="ti ti-user"></i> Intervenant</p>
+        <div class="detail-fields">
+            <div class="detail-field">
+                <span class="detail-label">Prénom</span>
+                <span class="detail-value">{{ inter.prenom }}</span>
+            </div>
+            <div class="detail-field">
+                <span class="detail-label">Nom</span>
+                <span class="detail-value">{{ inter.nom }}</span>
+            </div>
+            <div class="detail-field">
+                <span class="detail-label">Date</span>
+                <span class="detail-value">{{ inter.date }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <p class="section-head"><i class="ti ti-checklist"></i> Actions réalisées</p>
+        <div class="detail-checks">
+            <div class="detail-check">
+                <span>Nettoyage</span>
+                {% if inter.nettoyage %}
+                <span class="detail-tag tag-green"><i class="ti ti-circle-check"></i> Oui</span>
+                {% else %}
+                <span class="detail-tag tag-gray"><i class="ti ti-circle-x"></i> Non</span>
+                {% endif %}
+            </div>
+            <div class="detail-check">
+                <span>Changement des poumons</span>
+                {% if inter.changement_poumons %}
+                <span class="detail-tag tag-green"><i class="ti ti-circle-check"></i> Oui</span>
+                {% else %}
+                <span class="detail-tag tag-gray"><i class="ti ti-circle-x"></i> Non</span>
+                {% endif %}
+            </div>
+            <div class="detail-check">
+                <span>Réparation</span>
+                {% if inter.reparation %}
+                <span class="detail-tag tag-green"><i class="ti ti-circle-check"></i> Oui</span>
+                {% else %}
+                <span class="detail-tag tag-red"><i class="ti ti-alert-triangle"></i> Non</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% if inter.informations %}
+    <div class="section">
+        <p class="section-head"><i class="ti ti-message-dots"></i> Informations</p>
+        <p class="detail-text">{{ inter.informations }}</p>
+    </div>
+    {% endif %}
+
+    {% if photos %}
+    <div class="section">
+        <p class="section-head"><i class="ti ti-camera"></i> Photos ({{ photos|length }})</p>
+        <div class="detail-photos">
+            {% for p in photos %}
+            <a href="{{ url_for('serve_photo', filename=p.filename) }}" target="_blank" class="detail-photo">
+                <img src="{{ url_for('serve_photo', filename=p.filename) }}" alt="{{ p.original_name }}">
+                <span class="detail-photo-dl"><i class="ti ti-download"></i></span>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if inter.signature_path %}
+    <div class="section">
+        <p class="section-head"><i class="ti ti-writing"></i> Signature</p>
+        <img src="{{ url_for('serve_signature', filename=inter.signature_path) }}" alt="Signature" class="detail-signature">
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

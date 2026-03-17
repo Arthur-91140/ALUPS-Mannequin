@@ -512,6 +512,35 @@ def admin_history(mannequin_id):
     )
 
 
+@app.route('/admin/interventions/<int:intervention_id>')
+@admin_required
+def admin_intervention_detail(intervention_id):
+    conn = get_db()
+    inter = conn.execute('''
+        SELECT i.*, m.numero as m_numero, m.type as m_type, m.id as m_id
+        FROM interventions i
+        JOIN mannequins m ON i.mannequin_id = m.id
+        WHERE i.id = ?
+    ''', (intervention_id,)).fetchone()
+
+    if not inter:
+        flash('Intervention introuvable.', 'danger')
+        conn.close()
+        return redirect(url_for('admin_dashboard'))
+
+    photos = conn.execute(
+        'SELECT * FROM photos WHERE intervention_id = ? ORDER BY id',
+        (intervention_id,)
+    ).fetchall()
+    conn.close()
+
+    return render_template(
+        'admin_intervention.html',
+        inter=inter,
+        photos=photos
+    )
+
+
 @app.route('/admin/interventions/<int:intervention_id>/delete', methods=['POST'])
 @admin_required
 def admin_delete_intervention(intervention_id):
