@@ -25,7 +25,7 @@
                     <td>{{ i.nom }}</td>
                     <td class="tc">{% if i.nettoyage %}<i class="ti ti-circle-check st-yes"></i>{% else %}<i class="ti ti-circle-x st-no"></i>{% endif %}</td>
                     <td class="tc">{% if i.changement_poumons %}<i class="ti ti-circle-check st-yes"></i>{% else %}<i class="ti ti-circle-x st-no"></i>{% endif %}</td>
-                    <td class="tc">{% if i.reparation %}<i class="ti ti-circle-check st-ok"></i>{% else %}<i class="ti ti-alert-triangle st-warn"></i>{% endif %}</td>
+                    <td class="tc">{% if i.reparation %}<i class="ti ti-alert-triangle st-warn"></i>{% else %}<i class="ti ti-circle-check st-ok"></i>{% endif %}</td>
                     <td class="tc">
                         {% set nb = photos_by_intervention.get(i.id, [])|length %}
                         {% if nb %}<span class="pill"><i class="ti ti-camera" style="font-size:0.85em"></i> {{ nb }}</span>{% else %}<span class="st-no">—</span>{% endif %}
