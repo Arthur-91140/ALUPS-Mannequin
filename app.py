@@ -91,6 +91,11 @@ def init_db():
             FOREIGN KEY (intervention_id) REFERENCES interventions(id) ON DELETE CASCADE
         );
     ''')
+    # Add column if missing (preserves existing data)
+    try:
+        conn.execute('ALTER TABLE interventions ADD COLUMN description_reparation TEXT DEFAULT ""')
+    except sqlite3.OperationalError:
+        pass  # Column already exists
     conn.commit()
     conn.close()
 
@@ -161,6 +166,7 @@ def formulaire_submit():
     nettoyage = request.form.get('nettoyage')
     changement_poumons = request.form.get('changement_poumons')
     reparation = request.form.get('reparation')
+    description_reparation = request.form.get('description_reparation', '').strip()
     informations = request.form.get('informations', '').strip()
     signature_data = request.form.get('signature', '')
 
@@ -180,6 +186,8 @@ def formulaire_submit():
         errors.append('Veuillez indiquer si un changement des poumons a été effectué.')
     if reparation not in ('oui', 'non'):
         errors.append('Veuillez indiquer si une réparation a été effectuée.')
+    if reparation == 'oui' and not description_reparation:
+        errors.append('Veuillez décrire la réparation effectuée.')
     if not signature_data:
         errors.append('Veuillez signer le formulaire.')
 
@@ -218,13 +226,14 @@ def formulaire_submit():
     cursor = conn.execute(
         '''INSERT INTO interventions
            (mannequin_id, date, prenom, nom, nettoyage, changement_poumons,
-            reparation, informations, signature_path)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+            reparation, description_reparation, informations, signature_path)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
         (
             mannequin_id, date, prenom, nom,
             1 if nettoyage == 'oui' else 0,
             1 if changement_poumons == 'oui' else 0,
             1 if reparation == 'oui' else 0,
+            description_reparation if reparation == 'oui' else '',
             informations, signature_path
         )
     )

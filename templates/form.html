@@ -94,6 +94,12 @@
                     </div>
                 </div>
 
+                <div class="field" id="reparationDescField" style="display:none; margin-top:0.5rem;">
+                    <label class="label">Description de la réparation <span class="req">*</span></label>
+                    <textarea class="textarea" name="description_reparation" id="descReparation" rows="2"
+                              placeholder="Décrivez la réparation effectuée...">{{ form_data.description_reparation if form_data else '' }}</textarea>
+                </div>
+
                 <div class="fdiv"></div>
 
                 <p class="fsec"><i class="ti ti-message-dots"></i> Commentaires</p>
@@ -173,6 +179,18 @@ document.addEventListener('DOMContentLoaded', function() {
     typeSelect.addEventListener('change', updateNumeros);
     numeroSelect.addEventListener('change', function() { mannequinIdInput.value = this.options[this.selectedIndex].dataset.id || ''; });
     if (preType) updateNumeros();
+
+    // Show/hide repair description
+    const repField = document.getElementById('reparationDescField');
+    const repDesc = document.getElementById('descReparation');
+    function toggleRepair() {
+        const checked = document.querySelector('input[name="reparation"]:checked');
+        const show = checked && checked.value === 'oui';
+        repField.style.display = show ? '' : 'none';
+        if (!show) repDesc.value = '';
+    }
+    document.querySelectorAll('input[name="reparation"]').forEach(r => r.addEventListener('change', toggleRepair));
+    toggleRepair();
 
     const canvas = document.getElementById('signatureCanvas');
     const pad = new SignaturePad(canvas, { backgroundColor: 'rgba(255,255,255,0)', penColor: '#1e293b' });
