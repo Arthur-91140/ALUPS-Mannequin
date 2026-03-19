@@ -1,6 +1,12 @@
 {% extends "base.html" %}
 {% block title %}Formulaire de suivi{% endblock %}
 
+{% block topbar_right %}
+<a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline btn-sm">
+    <i class="ti ti-dashboard"></i> Administration
+</a>
+{% endblock %}
+
 {% block content %}
 <div class="page-center">
     <div class="card">
