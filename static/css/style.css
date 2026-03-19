@@ -82,7 +82,7 @@ img { max-width: 100%; display: block; }
 }
 
 .topbar-logo {
-    height: 50px;
+    height: 58px;
     transition: transform 0.2s var(--ease), opacity 0.2s;
 }
 
