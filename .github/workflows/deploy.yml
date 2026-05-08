@@ -53,14 +53,14 @@ jobs:
 
       - name: Configuration de la clé SSH
         env:
-          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_SSH_KEY_B64: ${{ secrets.DEPLOY_SSH_KEY_B64 }}
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
         run: |
           mkdir -p ~/.ssh
-          printf '%s\n' "$DEPLOY_SSH_KEY" | tr -d '\r' > ~/.ssh/id_ed25519
+          echo "$DEPLOY_SSH_KEY_B64" | tr -d ' \r\n' | base64 -d > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
           if ! ssh-keygen -y -f ~/.ssh/id_ed25519 > /dev/null 2>&1; then
-            echo "::error::Clé SSH invalide. Vérifie le secret DEPLOY_SSH_KEY (format OpenSSH attendu)."
+            echo "::error::Clé SSH invalide après décodage base64. Vérifie le secret DEPLOY_SSH_KEY_B64."
             exit 1
           fi
           echo "Clé SSH valide"
