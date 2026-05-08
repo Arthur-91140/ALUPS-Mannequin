@@ -57,8 +57,13 @@ jobs:
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
         run: |
           mkdir -p ~/.ssh
-          echo "$DEPLOY_SSH_KEY" > ~/.ssh/id_ed25519
+          printf '%s\n' "$DEPLOY_SSH_KEY" | tr -d '\r' > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
+          if ! ssh-keygen -y -f ~/.ssh/id_ed25519 > /dev/null 2>&1; then
+            echo "::error::Clé SSH invalide. Vérifie le secret DEPLOY_SSH_KEY (format OpenSSH attendu)."
+            exit 1
+          fi
+          echo "Clé SSH valide"
           ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts 2>/dev/null
 
       - name: Exécution du script de déploiement à distance
