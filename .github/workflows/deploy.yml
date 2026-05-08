@@ -1,0 +1,83 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-main
+  cancel-in-progress: false
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Installer ruff
+        run: pip install ruff
+      - name: Vérification syntaxique
+        run: python -m compileall -q app.py
+      - name: Lint (non bloquant sur le style)
+        run: ruff check . || true
+
+  test:
+    name: Smoke test
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: pip
+      - name: Installer les dépendances
+        run: pip install -r requirements.txt
+      - name: Vérifier que l'app s'importe et démarre
+        run: |
+          python -c "import app; assert hasattr(app, 'app'), 'Flask app non trouvée'; print('Import OK')"
+
+  deploy:
+    name: Déploiement serveur
+    runs-on: ubuntu-latest
+    needs: [lint, test]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configuration de la clé SSH
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$DEPLOY_SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Exécution du script de déploiement à distance
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+        run: |
+          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=accept-new \
+            "$DEPLOY_USER@$DEPLOY_HOST" 'bash -s' < scripts/deploy.sh
+
+      - name: Healthcheck public (HTTPS)
+        run: |
+          for i in 1 2 3 4 5; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" "https://arthur.xn--pruvost-rivire-6jb.fr/ALUPS-Mannequin/" || echo "000")
+            if echo "$code" | grep -qE "^(200|301|302|401|403)$"; then
+              echo "Site accessible publiquement (HTTP $code)"
+              exit 0
+            fi
+            sleep 3
+          done
+          echo "Site non accessible publiquement"
+          exit 1
