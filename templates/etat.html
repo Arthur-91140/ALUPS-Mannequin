@@ -2,9 +2,14 @@
 {% block title %}État des mannequins{% endblock %}
 
 {% block topbar_right %}
-<a href="{{ url_for('formulaire') }}" class="btn btn-outline btn-sm" data-c="blue">
-    <i class="ti ti-clipboard-heart"></i> Formulaire de suivi
-</a>
+<div class="topbar-right">
+    <a href="{{ url_for('formulaire') }}" class="btn btn-outline btn-sm" data-c="blue">
+        <i class="ti ti-clipboard-heart"></i> Formulaire de suivi
+    </a>
+    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline btn-sm">
+        <i class="ti ti-dashboard"></i> Administration
+    </a>
+</div>
 {% endblock %}
 
 {% block content %}
