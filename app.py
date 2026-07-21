@@ -489,7 +489,7 @@ def admin_dashboard():
     ''').fetchall()
     conn.close()
 
-    size_sans, size_avec = _export_sizes()
+    export_full, export_by_mannequin = _export_sizes()
 
     return render_template(
         'admin_dashboard.html',
@@ -498,8 +498,9 @@ def admin_dashboard():
         types=MANNEQUIN_TYPES,
         statuts=STATUTS,
         default_statut=DEFAULT_STATUT,
-        export_size_sans=_format_size(size_sans),
-        export_size_avec=_format_size(size_avec)
+        export_full=export_full,
+        export_by_mannequin=export_by_mannequin,
+        export_default=_size_pair(0, 0, 0)
     )
 
 
@@ -633,11 +634,27 @@ def admin_history(mannequin_id):
 
     conn.close()
 
+    # Tailles estimées de l'export de ce mannequin (sans / avec photos)
+    sig_bytes = 0
+    for it in interventions:
+        if it['signature_path']:
+            p = os.path.join(SIGNATURES_DIR, it['signature_path'])
+            if os.path.exists(p):
+                sig_bytes += os.path.getsize(p)
+    photo_bytes = 0
+    for plist in photos_by_intervention.values():
+        for ph in plist:
+            p = os.path.join(PHOTOS_DIR, ph['filename'])
+            if os.path.exists(p):
+                photo_bytes += os.path.getsize(p)
+    export_pair = _size_pair(len(interventions), sig_bytes, photo_bytes)
+
     return render_template(
         'admin_history.html',
         mannequin=mannequin,
         interventions=interventions,
-        photos_by_intervention=photos_by_intervention
+        photos_by_intervention=photos_by_intervention,
+        export_pair=export_pair
     )
 
 
@@ -716,32 +733,49 @@ def _format_size(n):
     return f"{n / (1024 * 1024):.1f} Mo"
 
 
+def _size_pair(nb, sig_bytes, photo_bytes):
+    """(taille sans photos, taille avec photos) formatées, pour nb interventions."""
+    overhead = 6 * 1024 + 200 * nb  # structure du .xlsx (approximatif)
+    sans = overhead + sig_bytes
+    return _format_size(sans), _format_size(sans + photo_bytes)
+
+
 def _export_sizes():
-    """Estime les tailles de l'export Excel complet, sans et avec photos (octets)."""
+    """Estime les tailles de l'export Excel (sans/avec photos), au total et par
+    mannequin, en un seul passage. Renvoie (paire_totale, {mannequin_id: paire})
+    où chaque paire est (taille_sans, taille_avec) déjà formatée."""
     conn = get_db()
-    signatures = conn.execute(
-        "SELECT signature_path FROM interventions WHERE signature_path IS NOT NULL"
+    inters = conn.execute(
+        "SELECT id, mannequin_id, signature_path FROM interventions"
     ).fetchall()
-    photos = conn.execute("SELECT filename FROM photos").fetchall()
-    nb_inter = conn.execute("SELECT COUNT(*) FROM interventions").fetchone()[0]
+    photos = conn.execute(
+        "SELECT p.filename, i.mannequin_id FROM photos p "
+        "JOIN interventions i ON p.intervention_id = i.id"
+    ).fetchall()
     conn.close()
 
-    sig_bytes = 0
-    for s in signatures:
-        p = os.path.join(SIGNATURES_DIR, s['signature_path'])
-        if os.path.exists(p):
-            sig_bytes += os.path.getsize(p)
-
-    photo_bytes = 0
+    per = {}   # mannequin_id -> [nb, sig_bytes, photo_bytes]
+    total = [0, 0, 0]
+    for it in inters:
+        d = per.setdefault(it['mannequin_id'], [0, 0, 0])
+        d[0] += 1
+        total[0] += 1
+        if it['signature_path']:
+            p = os.path.join(SIGNATURES_DIR, it['signature_path'])
+            if os.path.exists(p):
+                sz = os.path.getsize(p)
+                d[1] += sz
+                total[1] += sz
     for ph in photos:
         p = os.path.join(PHOTOS_DIR, ph['filename'])
         if os.path.exists(p):
-            photo_bytes += os.path.getsize(p)
+            sz = os.path.getsize(p)
+            per.setdefault(ph['mannequin_id'], [0, 0, 0])[2] += sz
+            total[2] += sz
 
-    overhead = 6 * 1024 + 200 * nb_inter  # structure du .xlsx (approximatif)
-    sans = overhead + sig_bytes
-    avec = sans + photo_bytes
-    return sans, avec
+    full = _size_pair(*total)
+    by_mannequin = {mid: _size_pair(*vals) for mid, vals in per.items()}
+    return full, by_mannequin
 
 
 def _photos_by_intervention(conn, ids):

@@ -7,7 +7,12 @@
         <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline btn-sm"><i class="ti ti-arrow-left"></i></a>
         <h1><span class="badge badge-{{ mannequin.type|lower }}">{{ mannequin.type }}</span> Mannequin N°{{ mannequin.numero }}</h1>
     </div>
-    <a href="{{ url_for('admin_export_mannequin', mannequin_id=mannequin.id) }}" class="btn btn-green btn-sm"><i class="ti ti-file-spreadsheet"></i> Excel</a>
+    <button type="button" class="btn btn-green btn-sm"
+            onclick="openExportModal(this)"
+            data-url="{{ url_for('admin_export_mannequin', mannequin_id=mannequin.id) }}"
+            data-label="{{ mannequin.type }} N°{{ mannequin.numero }}"
+            data-size-sans="{{ export_pair[0] }}"
+            data-size-avec="{{ export_pair[1] }}"><i class="ti ti-file-spreadsheet"></i> Excel</button>
 </div>
 
 <div class="section">

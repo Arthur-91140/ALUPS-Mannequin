@@ -43,6 +43,66 @@
         {% block content %}{% endblock %}
     </div>
 
+    <!-- Modale d'export Excel (partagée par toutes les pages admin, remplie par le bouton cliqué) -->
+    <div class="modal-overlay" id="exportModal" aria-hidden="true">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="exportModalTitle">
+            <div class="modal-head">
+                <span id="exportModalTitle"><i class="ti ti-file-spreadsheet"></i> Télécharger l'Excel</span>
+                <button type="button" class="modal-close" id="exportModalClose" aria-label="Fermer"><i class="ti ti-x"></i></button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-target" id="exportTarget"></p>
+                <p style="font-size:0.85rem; color:var(--g500); margin-bottom:0.9rem;">
+                    Souhaitez-vous inclure les photos des interventions ? Elles augmentent la taille du fichier.
+                </p>
+                <div class="export-options">
+                    <a href="#" id="exportSans" class="export-option" onclick="closeExportModal()">
+                        <span class="export-option-ic"><i class="ti ti-file-spreadsheet"></i></span>
+                        <span class="export-option-txt">
+                            <strong>Sans photos</strong>
+                            <small id="exportSansSize"></small>
+                        </span>
+                        <i class="ti ti-download export-option-dl"></i>
+                    </a>
+                    <a href="#" id="exportAvec" class="export-option" onclick="closeExportModal()">
+                        <span class="export-option-ic"><i class="ti ti-photo"></i></span>
+                        <span class="export-option-txt">
+                            <strong>Avec photos</strong>
+                            <small id="exportAvecSize"></small>
+                        </span>
+                        <i class="ti ti-download export-option-dl"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    function openExportModal(btn) {
+        const modal = document.getElementById('exportModal');
+        const url = btn.dataset.url;
+        document.getElementById('exportTarget').textContent = btn.dataset.label || '';
+        document.getElementById('exportSans').href = url;
+        document.getElementById('exportAvec').href = url + (url.includes('?') ? '&' : '?') + 'photos=1';
+        document.getElementById('exportSansSize').textContent = 'Signatures uniquement · ~' + (btn.dataset.sizeSans || '');
+        document.getElementById('exportAvecSize').textContent = 'Signatures + photos · ~' + (btn.dataset.sizeAvec || '');
+        modal.classList.add('open');
+        modal.setAttribute('aria-hidden', 'false');
+    }
+    function closeExportModal() {
+        const modal = document.getElementById('exportModal');
+        modal.classList.remove('open');
+        modal.setAttribute('aria-hidden', 'true');
+    }
+    document.getElementById('exportModalClose').addEventListener('click', closeExportModal);
+    document.getElementById('exportModal').addEventListener('click', function (e) {
+        if (e.target.id === 'exportModal') closeExportModal();
+    });
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeExportModal();
+    });
+    </script>
+
     {% block scripts %}{% endblock %}
 </body>
 </html>
