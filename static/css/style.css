@@ -280,7 +280,8 @@ tbody tr:last-child td { border-bottom: none; }
     text-shadow: 0 1px 1px rgba(0,0,0,0.1);
 }
 
-.badge-adulte     { background: linear-gradient(135deg, var(--blue) 0%, var(--blue-light) 100%); }
+.badge-homme      { background: linear-gradient(135deg, var(--blue) 0%, var(--blue-light) 100%); }
+.badge-femme      { background: linear-gradient(135deg, #be185d 0%, #ec4899 100%); }
 .badge-enfant     { background: linear-gradient(135deg, #d97706 0%, var(--orange) 100%); }
 .badge-nourrisson { background: linear-gradient(135deg, #7c3aed 0%, var(--purple) 100%); }
 

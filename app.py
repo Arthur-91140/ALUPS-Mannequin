@@ -41,7 +41,7 @@ else:
     with open(SECRET_KEY_FILE, 'wb') as f:
         f.write(app.secret_key)
 
-MANNEQUIN_TYPES = ['Adulte', 'Enfant', 'Nourrisson']
+MANNEQUIN_TYPES = ['Homme', 'Femme', 'Enfant', 'Nourrisson']
 DEFAULT_ADMIN_PASSWORD = 'ALUPSAdmin'
 
 # Statuts possibles d'un mannequin (clé stockée en base -> affichage)
@@ -73,7 +73,7 @@ def init_db():
         CREATE TABLE IF NOT EXISTS mannequins (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             numero TEXT NOT NULL,
-            type TEXT NOT NULL CHECK(type IN ('Adulte', 'Enfant', 'Nourrisson')),
+            type TEXT NOT NULL CHECK(type IN ('Homme', 'Femme', 'Enfant', 'Nourrisson')),
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             UNIQUE(numero, type)
         );
@@ -116,6 +116,38 @@ def init_db():
             conn.execute(ddl)
         except sqlite3.OperationalError:
             pass  # Column already exists
+
+    # Migration des types : 'Adulte' -> 'Homme' + ajout de 'Femme'.
+    # La contrainte CHECK est figée dans la table : on recrée donc la table.
+    # foreign_keys OFF pour éviter que le DROP TABLE ne supprime en cascade les
+    # interventions ; les id sont conservés pour garder les liens intacts.
+    row = conn.execute(
+        "SELECT sql FROM sqlite_master WHERE type='table' AND name='mannequins'"
+    ).fetchone()
+    if row and 'Adulte' in row[0]:
+        conn.commit()
+        conn.execute('PRAGMA foreign_keys = OFF')
+        conn.executescript('''
+            DROP TABLE IF EXISTS mannequins_new;
+            CREATE TABLE mannequins_new (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                numero TEXT NOT NULL,
+                type TEXT NOT NULL CHECK(type IN ('Homme', 'Femme', 'Enfant', 'Nourrisson')),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                statut TEXT DEFAULT 'operationnel',
+                statut_detail TEXT DEFAULT '',
+                statut_updated_at TIMESTAMP,
+                UNIQUE(numero, type)
+            );
+            INSERT INTO mannequins_new (id, numero, type, created_at, statut, statut_detail, statut_updated_at)
+                SELECT id, numero,
+                       CASE WHEN type = 'Adulte' THEN 'Homme' ELSE type END,
+                       created_at, statut, statut_detail, statut_updated_at
+                FROM mannequins;
+            DROP TABLE mannequins;
+            ALTER TABLE mannequins_new RENAME TO mannequins;
+        ''')
+        conn.execute('PRAGMA foreign_keys = ON')
 
     conn.commit()
     conn.close()
