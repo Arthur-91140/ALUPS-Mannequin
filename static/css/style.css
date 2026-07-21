@@ -760,6 +760,149 @@ tbody tr:last-child td { border-bottom: none; }
 }
 
 /* ═══════════════════════════════════════════════════════
+   DASHBOARD PUBLIC — ÉTAT DES MANNEQUINS
+   ═══════════════════════════════════════════════════════ */
+
+.etat-wrap {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 1.75rem 1.25rem 3rem;
+}
+
+.etat-header { margin-bottom: 1.75rem; }
+
+.etat-header h1 {
+    font-size: 1.45rem;
+    font-weight: 800;
+    color: var(--g900);
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    letter-spacing: -0.01em;
+}
+
+.etat-header h1 i { color: var(--red); font-size: 1.5rem; }
+
+.etat-header p {
+    color: var(--g500);
+    font-size: 0.92rem;
+    margin-top: 0.35rem;
+}
+
+.etat-type-section { margin-bottom: 2rem; }
+
+.etat-type-title {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.9rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 2px solid var(--g100);
+}
+
+.etat-type-title .badge { font-size: 0.8rem; padding: 0.3em 0.75em; }
+
+.etat-type-count {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--g400);
+}
+
+.etat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+    gap: 1rem;
+}
+
+.etat-card {
+    background: #fff;
+    border: 1px solid var(--g200);
+    border-left: 4px solid var(--g300);
+    border-radius: var(--radius);
+    padding: 1.1rem 1.15rem;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow 0.2s var(--ease), transform 0.2s var(--ease);
+}
+
+.etat-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+
+.etat-card-operationnel { border-left-color: var(--green); }
+.etat-card-hs           { border-left-color: var(--red); }
+.etat-card-maintenance  { border-left-color: var(--orange); }
+.etat-card-defaut       { border-left-color: #dc2626; }
+
+.etat-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+}
+
+.etat-num {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--g800);
+}
+
+.etat-detail {
+    margin-top: 0.85rem;
+    padding: 0.6rem 0.75rem;
+    background: var(--g50);
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--g300);
+}
+
+.etat-detail-defaut {
+    background: var(--red-50);
+    border-left-color: var(--red);
+}
+
+.etat-detail-lead {
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: var(--red);
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-bottom: 0.3rem;
+}
+
+.etat-detail-text {
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: var(--g700);
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.etat-card-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-top: auto;
+    padding-top: 0.9rem;
+    flex-wrap: wrap;
+}
+
+.etat-updated {
+    font-size: 0.74rem;
+    color: var(--g400);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+@media (max-width: 600px) {
+    .etat-wrap { padding: 1.25rem 0.9rem 2.5rem; }
+    .etat-header h1 { font-size: 1.25rem; }
+    .etat-grid { grid-template-columns: 1fr; }
+}
+
+/* ═══════════════════════════════════════════════════════
    SUCCESS
    ═══════════════════════════════════════════════════════ */
 
@@ -868,6 +1011,13 @@ tbody tr:last-child td { border-bottom: none; }
 }
 
 .admin-bar h1 i { color: var(--blue); font-size: 1.3rem; }
+
+.admin-bar-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
 
 .section {
     background: #fff;

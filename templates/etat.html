@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}État des mannequins{% endblock %}
+
+{% block topbar_right %}
+<a href="{{ url_for('formulaire') }}" class="btn btn-outline btn-sm" data-c="blue">
+    <i class="ti ti-clipboard-heart"></i> Formulaire de suivi
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="etat-wrap">
+    <div class="etat-header">
+        <h1><i class="ti ti-activity-heartbeat"></i> État des mannequins</h1>
+        <p>Consultez en temps réel le statut de chaque mannequin de formation.</p>
+    </div>
+
+    {% if total == 0 %}
+    <div class="section">
+        <div class="empty-state">
+            <i class="ti ti-box-off"></i>
+            Aucun mannequin enregistré pour le moment.
+        </div>
+    </div>
+    {% else %}
+    {% for t in types %}
+    {% set liste = mannequins_par_type[t] %}
+    {% if liste %}
+    <section class="etat-type-section">
+        <h2 class="etat-type-title">
+            <span class="badge badge-{{ t|lower }}">{{ t }}</span>
+            <span class="etat-type-count">{{ liste|length }} mannequin{{ 's' if liste|length > 1 else '' }}</span>
+        </h2>
+        <div class="etat-grid">
+            {% for m in liste %}
+            {% set st = statuts.get(m.statut, statuts[default_statut]) %}
+            <article class="etat-card etat-card-{{ st.classe }}">
+                <div class="etat-card-top">
+                    <span class="etat-num">N°{{ m.numero }}</span>
+                    <span class="badge-statut badge-statut-{{ st.classe }}">
+                        <i class="ti ti-{{ st.icon }}"></i> {{ st.label }}
+                    </span>
+                </div>
+
+                {% if m.statut == 'defaut' %}
+                <div class="etat-detail etat-detail-defaut">
+                    <p class="etat-detail-lead"><i class="ti ti-info-circle-filled"></i> Défaut signalé — information prise en compte</p>
+                    <p class="etat-detail-text">{{ m.statut_detail }}</p>
+                </div>
+                {% elif m.statut_detail %}
+                <div class="etat-detail">
+                    <p class="etat-detail-text">{{ m.statut_detail }}</p>
+                </div>
+                {% endif %}
+
+                <div class="etat-card-foot">
+                    {% if m.statut_updated_at %}
+                    {% set d = m.statut_updated_at[:10].split('-') %}
+                    <span class="etat-updated"><i class="ti ti-clock"></i> Mis à jour le {{ d[2] }}/{{ d[1] }}/{{ d[0] }}</span>
+                    {% else %}
+                    <span></span>
+                    {% endif %}
+                    <a href="{{ url_for('formulaire', type=m.type, numero=m.numero) }}" class="btn btn-outline btn-sm" data-c="blue">
+                        <i class="ti ti-clipboard-plus"></i> Faire un suivi
+                    </a>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+    {% endfor %}
+    {% endif %}
+</div>
+{% endblock %}

@@ -284,6 +284,32 @@ def formulaire_success():
     return render_template('form_success.html')
 
 
+@app.route('/etat')
+def etat():
+    """Dashboard public de l'état des mannequins (lecture seule, sans auth)."""
+    conn = get_db()
+    rows = conn.execute(
+        'SELECT * FROM mannequins ORDER BY type, numero'
+    ).fetchall()
+    conn.close()
+
+    # Regroupement par type, en conservant l'ordre de MANNEQUIN_TYPES
+    mannequins_par_type = {t: [] for t in MANNEQUIN_TYPES}
+    for r in rows:
+        m = dict(r)
+        if m['type'] in mannequins_par_type:
+            mannequins_par_type[m['type']].append(m)
+
+    return render_template(
+        'etat.html',
+        mannequins_par_type=mannequins_par_type,
+        types=MANNEQUIN_TYPES,
+        statuts=STATUTS,
+        default_statut=DEFAULT_STATUT,
+        total=len(rows)
+    )
+
+
 # ── API ───────────────────────────────────────────────────
 
 @app.route('/api/mannequins')

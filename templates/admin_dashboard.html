@@ -4,7 +4,11 @@
 {% block content %}
 <div class="admin-bar">
     <h1><i class="ti ti-dashboard"></i> Tableau de bord</h1>
-    <a href="{{ url_for('admin_export') }}" class="btn btn-green"><i class="ti ti-file-spreadsheet"></i> Télécharger l'Excel complet</a>
+    <div class="admin-bar-actions">
+        <a href="{{ url_for('etat') }}" target="_blank" class="btn btn-outline btn-sm" data-c="blue"><i class="ti ti-activity-heartbeat"></i> Voir l'état public</a>
+        <button type="button" class="btn btn-outline btn-sm" onclick="copyEtatLink(this)"><i class="ti ti-link"></i> Copier le lien</button>
+        <a href="{{ url_for('admin_export') }}" class="btn btn-green"><i class="ti ti-file-spreadsheet"></i> Télécharger l'Excel complet</a>
+    </div>
 </div>
 
 <div class="admin-grid">
@@ -133,6 +137,16 @@ function copyLink(btn, type, numero) {
         const orig = btn.innerHTML;
         btn.innerHTML = '<i class="ti ti-check"></i> Copié';
         btn.classList.add('btn-outline');
+        btn.setAttribute('data-c', 'green');
+        setTimeout(() => { btn.innerHTML = orig; btn.removeAttribute('data-c'); }, 1500);
+    });
+}
+
+function copyEtatLink(btn) {
+    const url = location.origin + '{{ url_for("etat") }}';
+    navigator.clipboard.writeText(url).then(() => {
+        const orig = btn.innerHTML;
+        btn.innerHTML = '<i class="ti ti-check"></i> Lien copié';
         btn.setAttribute('data-c', 'green');
         setTimeout(() => { btn.innerHTML = orig; btn.removeAttribute('data-c'); }, 1500);
     });
