@@ -48,8 +48,8 @@
 
                 {% if m.statut == 'defaut' %}
                 <div class="etat-detail etat-detail-defaut">
-                    <p class="etat-detail-lead"><i class="ti ti-info-circle-filled"></i> Défaut signalé — information prise en compte</p>
-                    <p class="etat-detail-text">{{ m.statut_detail }}</p>
+                    <p class="etat-detail-lead"><i class="ti ti-info-circle-filled"></i> Défaut signalé</p>
+                    <p class="etat-detail-text"><strong>Détail :</strong> {{ m.statut_detail }}</p>
                 </div>
                 {% elif m.statut_detail %}
                 <div class="etat-detail">
