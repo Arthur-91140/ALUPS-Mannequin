@@ -5,8 +5,7 @@
 <div class="admin-bar">
     <h1><i class="ti ti-dashboard"></i> Tableau de bord</h1>
     <div class="admin-bar-actions">
-        <a href="{{ url_for('etat') }}" target="_blank" class="btn btn-outline btn-sm" data-c="blue"><i class="ti ti-activity-heartbeat"></i> Voir l'état public</a>
-        <button type="button" class="btn btn-outline btn-sm" onclick="copyEtatLink(this)"><i class="ti ti-link"></i> Copier le lien</button>
+        <button type="button" class="btn btn-outline btn-sm" onclick="copyEtatLink(this)"><i class="ti ti-link"></i> Copier le lien public</button>
         <a href="{{ url_for('admin_export') }}" class="btn btn-green"><i class="ti ti-file-spreadsheet"></i> Télécharger l'Excel complet</a>
     </div>
 </div>
