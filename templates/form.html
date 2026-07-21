@@ -2,12 +2,14 @@
 {% block title %}Formulaire de suivi{% endblock %}
 
 {% block topbar_right %}
-<a href="{{ url_for('etat') }}" class="btn btn-outline btn-sm" data-c="blue">
-    <i class="ti ti-activity-heartbeat"></i> État des mannequins
-</a>
-<a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline btn-sm">
-    <i class="ti ti-dashboard"></i> Administration
-</a>
+<div class="topbar-right">
+    <a href="{{ url_for('etat') }}" class="btn btn-outline btn-sm" data-c="blue">
+        <i class="ti ti-activity-heartbeat"></i> État des mannequins
+    </a>
+    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline btn-sm">
+        <i class="ti ti-dashboard"></i> Administration
+    </a>
+</div>
 {% endblock %}
 
 {% block content %}
