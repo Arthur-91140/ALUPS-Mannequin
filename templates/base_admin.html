@@ -2,8 +2,9 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>{% block title %}Administration{% endblock %} — ALUPS</title>
+    {% include '_pwa_head.html' %}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3/dist/tabler-icons.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
@@ -16,17 +17,17 @@
             <span class="topbar-tag">Administration</span>
         </div>
         <div class="topbar-right">
-            <a href="{{ url_for('formulaire') }}" class="btn btn-outline btn-sm" data-c="blue">
-                <i class="ti ti-clipboard-heart"></i> Formulaire
+            <a href="{{ url_for('formulaire') }}" class="btn btn-outline btn-sm" data-c="blue" title="Formulaire">
+                <i class="ti ti-clipboard-heart"></i> <span class="btn-label">Formulaire</span>
             </a>
-            <a href="{{ url_for('etat') }}" target="_blank" class="btn btn-outline btn-sm" data-c="blue">
-                <i class="ti ti-activity-heartbeat"></i> État public
+            <a href="{{ url_for('etat') }}" target="_blank" class="btn btn-outline btn-sm" data-c="blue" title="État public">
+                <i class="ti ti-activity-heartbeat"></i> <span class="btn-label">État public</span>
             </a>
-            <a href="{{ url_for('admin_password') }}" class="btn btn-outline btn-sm">
-                <i class="ti ti-lock"></i> Mot de passe
+            <a href="{{ url_for('admin_password') }}" class="btn btn-outline btn-sm" title="Mot de passe">
+                <i class="ti ti-lock"></i> <span class="btn-label">Mot de passe</span>
             </a>
-            <a href="{{ url_for('admin_logout') }}" class="btn btn-outline btn-sm">
-                <i class="ti ti-logout"></i> Déconnexion
+            <a href="{{ url_for('admin_logout') }}" class="btn btn-outline btn-sm" title="Déconnexion">
+                <i class="ti ti-logout"></i> <span class="btn-label">Déconnexion</span>
             </a>
         </div>
     </div>
@@ -104,5 +105,6 @@
     </script>
 
     {% block scripts %}{% endblock %}
+    {% include '_pwa_register.html' %}
 </body>
 </html>

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Hors ligne{% endblock %}
+
+{% block content %}
+<div class="success-wrap">
+    <div class="card">
+        <div class="card-body">
+            <div class="success-ring offline-ring"><i class="ti ti-wifi-off"></i></div>
+            <h2>Vous êtes hors ligne</h2>
+            <p>Cette page nécessite une connexion internet.<br>Vérifiez votre réseau puis réessayez.</p>
+            <button type="button" class="btn btn-primary" onclick="location.reload()">
+                <i class="ti ti-refresh"></i> Réessayer
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}

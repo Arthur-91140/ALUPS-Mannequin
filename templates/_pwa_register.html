@@ -1,0 +1,10 @@
+{# Enregistrement du service worker — inclus avant </body> #}
+<script>
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+        navigator.serviceWorker
+            .register('{{ url_for("service_worker") }}', { scope: '{{ url_for("index") }}' })
+            .catch(function (err) { console.warn('SW registration failed:', err); });
+    });
+}
+</script>

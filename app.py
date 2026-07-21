@@ -8,7 +8,7 @@ from io import BytesIO
 
 from flask import (
     Flask, render_template, request, redirect, url_for,
-    session, flash, send_file, jsonify
+    session, flash, send_file, jsonify, make_response
 )
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -340,6 +340,33 @@ def etat():
         default_statut=DEFAULT_STATUT,
         total=len(rows)
     )
+
+
+# ── PWA (manifest, service worker, offline) ───────────────
+
+@app.route('/manifest.webmanifest')
+def manifest():
+    resp = make_response(render_template('manifest.webmanifest'))
+    resp.headers['Content-Type'] = 'application/manifest+json'
+    resp.headers['Cache-Control'] = 'no-cache'
+    return resp
+
+
+@app.route('/sw.js')
+def service_worker():
+    # Servi via Flask (et non en statique) pour que url_for respecte le
+    # sous-chemin de déploiement (/ALUPS-Mannequin/) : le scope du service
+    # worker devient alors automatiquement ce sous-chemin.
+    resp = make_response(render_template('sw.js'))
+    resp.headers['Content-Type'] = 'application/javascript'
+    resp.headers['Service-Worker-Allowed'] = url_for('index')
+    resp.headers['Cache-Control'] = 'no-cache'
+    return resp
+
+
+@app.route('/offline')
+def offline():
+    return render_template('offline.html')
 
 
 # ── API ───────────────────────────────────────────────────

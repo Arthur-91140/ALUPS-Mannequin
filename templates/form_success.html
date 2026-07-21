@@ -2,9 +2,11 @@
 {% block title %}Formulaire envoyé{% endblock %}
 
 {% block topbar_right %}
-<a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline btn-sm">
-    <i class="ti ti-dashboard"></i> Administration
-</a>
+<div class="topbar-right">
+    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline btn-sm" title="Administration">
+        <i class="ti ti-dashboard"></i> <span class="btn-label">Administration</span>
+    </a>
+</div>
 {% endblock %}
 
 {% block content %}

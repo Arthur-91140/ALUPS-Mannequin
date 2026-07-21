@@ -1,0 +1,60 @@
+{
+  "name": "ALUPS — Suivi des mannequins",
+  "short_name": "ALUPS Mannequins",
+  "description": "Suivi, traçabilité et état des mannequins de formation aux premiers secours.",
+  "lang": "fr",
+  "dir": "ltr",
+  "id": "{{ url_for('index') }}",
+  "start_url": "{{ url_for('formulaire') }}",
+  "scope": "{{ url_for('index') }}",
+  "display": "standalone",
+  "background_color": "#eef1f5",
+  "theme_color": "#1B3A6B",
+  "categories": ["medical", "productivity", "utilities"],
+  "icons": [
+    {
+      "src": "{{ url_for('static', filename='icons/icon-192.png') }}",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "{{ url_for('static', filename='icons/icon-512.png') }}",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "{{ url_for('static', filename='icons/icon-maskable-192.png') }}",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "{{ url_for('static', filename='icons/icon-maskable-512.png') }}",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Nouveau suivi",
+      "short_name": "Suivi",
+      "url": "{{ url_for('formulaire') }}",
+      "icons": [{ "src": "{{ url_for('static', filename='icons/icon-192.png') }}", "sizes": "192x192" }]
+    },
+    {
+      "name": "État des mannequins",
+      "short_name": "État",
+      "url": "{{ url_for('etat') }}",
+      "icons": [{ "src": "{{ url_for('static', filename='icons/icon-192.png') }}", "sizes": "192x192" }]
+    },
+    {
+      "name": "Administration",
+      "short_name": "Admin",
+      "url": "{{ url_for('admin_dashboard') }}",
+      "icons": [{ "src": "{{ url_for('static', filename='icons/icon-192.png') }}", "sizes": "192x192" }]
+    }
+  ]
+}

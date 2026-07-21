@@ -3,11 +3,11 @@
 
 {% block topbar_right %}
 <div class="topbar-right">
-    <a href="{{ url_for('formulaire') }}" class="btn btn-outline btn-sm" data-c="blue">
-        <i class="ti ti-clipboard-heart"></i> Formulaire de suivi
+    <a href="{{ url_for('formulaire') }}" class="btn btn-outline btn-sm" data-c="blue" title="Formulaire de suivi">
+        <i class="ti ti-clipboard-heart"></i> <span class="btn-label">Formulaire de suivi</span>
     </a>
-    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline btn-sm">
-        <i class="ti ti-dashboard"></i> Administration
+    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline btn-sm" title="Administration">
+        <i class="ti ti-dashboard"></i> <span class="btn-label">Administration</span>
     </a>
 </div>
 {% endblock %}

@@ -69,11 +69,13 @@ img { max-width: 100%; display: block; }
     background: rgba(255,255,255,0.92);
     backdrop-filter: blur(24px) saturate(180%);
     -webkit-backdrop-filter: blur(24px) saturate(180%);
-    padding: 0 1.5rem;
+    padding-left: max(1.5rem, env(safe-area-inset-left));
+    padding-right: max(1.5rem, env(safe-area-inset-right));
     height: 66px;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 0.75rem;
     position: sticky;
     top: 0;
     z-index: 100;
@@ -1212,9 +1214,50 @@ tbody tr:last-child td { border-bottom: none; }
 
 /* ── Mobile ────────────────────────────────────────── */
 
+/* ═══════════════════════════════════════════════════════
+   RESPONSIVE & PWA
+   ═══════════════════════════════════════════════════════ */
+
+/* Pas de débordement horizontal de la page */
+html, body { max-width: 100%; }
+body { overflow-x: hidden; }
+
+/* Icône « hors ligne » (page offline PWA) */
+.offline-ring {
+    background: linear-gradient(135deg, var(--g100) 0%, var(--g200) 100%);
+    color: var(--g500);
+    box-shadow: 0 0 0 10px rgba(100,116,139,0.05), 0 0 0 20px rgba(100,116,139,0.03);
+}
+
+/* Défilement tactile fluide des tableaux larges */
+.table-wrap { -webkit-overflow-scrolling: touch; }
+
+.topbar-right .btn-label { white-space: nowrap; }
+
+/* Cibles tactiles plus confortables sur écrans tactiles */
+@media (pointer: coarse) {
+    .btn-sm { min-height: 36px; }
+}
+
+/* Barre supérieure : navigation en icônes seules quand la place manque */
+@media (max-width: 720px) {
+    .topbar-right .btn .btn-label { display: none; }
+    .topbar-right .btn.btn-sm { padding: 0.45rem 0.6rem; }
+    .topbar-right { gap: 0.4rem; }
+}
+
 @media (max-width: 600px) {
-    .topbar { padding: 0 1rem; height: 56px; }
+    .topbar {
+        padding-left: max(1rem, env(safe-area-inset-left));
+        padding-right: max(1rem, env(safe-area-inset-right));
+        height: auto;
+        min-height: 56px;
+        padding-top: 0.4rem;
+        padding-bottom: 0.4rem;
+        flex-wrap: wrap;
+    }
     .topbar-logo { height: 38px; }
+    .topbar-right { flex-wrap: wrap; justify-content: flex-end; }
 
     .page-center { padding: 0 0 2rem; }
     .page-center .card {
@@ -1238,17 +1281,42 @@ tbody tr:last-child td { border-bottom: none; }
     .admin-content { padding: 1rem 0.75rem; }
     .admin-bar { flex-direction: column; align-items: flex-start; }
     .admin-bar h1 { font-size: 1rem; }
+    .admin-bar-actions { width: 100%; }
+    .admin-bar-actions .btn { flex: 1 1 auto; justify-content: center; }
 
     .section { padding: 1rem; border-radius: var(--radius-sm); }
 
+    /* Tableaux plus compacts (restent défilables horizontalement) */
+    table { font-size: 0.8rem; }
+    th { font-size: 0.62rem; padding: 0.6rem 0.55rem; }
+    td { padding: 0.6rem 0.55rem; }
+
     .topbar-tag { display: none; }
-    .actions { flex-wrap: wrap; }
+    .actions { flex-wrap: nowrap; }
 
     .success-wrap { margin: 1.5rem auto; }
     .success-wrap .card-body { padding: 2.5rem 1.5rem; }
 }
 
+@media (max-width: 480px) {
+    /* Formulaire d'ajout de mannequin empilé en pleine largeur */
+    .add-row { flex-direction: column; align-items: stretch; }
+    .add-row .select,
+    .add-row .input,
+    .add-row .btn { width: 100% !important; }
+
+    /* Boutons d'action admin empilés */
+    .admin-bar-actions { flex-direction: column; align-items: stretch; }
+    .admin-bar-actions .btn { width: 100%; }
+
+    .detail-fields { grid-template-columns: 1fr; }
+}
+
 @media (max-width: 400px) {
     .fgrid { grid-template-columns: 1fr; gap: 0; }
     .fgrid .field { margin-bottom: 0.85rem; }
+}
+
+@media (max-width: 360px) {
+    html { font-size: 14px; }
 }
