@@ -297,6 +297,28 @@ tbody tr:last-child td { border-bottom: none; }
     color: var(--blue);
 }
 
+/* ── Statut badges ─────────────────────────────────── */
+
+.badge-statut {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    padding: 0.28em 0.7em;
+    border-radius: 99px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 1.2;
+    border: 1.5px solid transparent;
+    white-space: nowrap;
+}
+
+.badge-statut i { font-size: 0.95em; }
+
+.badge-statut-operationnel { background: var(--green-50); color: #047857; border-color: var(--green-100); }
+.badge-statut-hs           { background: var(--red-50);   color: #991b1b; border-color: var(--red-100); }
+.badge-statut-maintenance  { background: #fff7ed;         color: #b45309; border-color: #fed7aa; }
+.badge-statut-defaut       { background: #fef2f2;         color: #b91c1c; border-color: #fecaca; }
+
 /* ── Status ────────────────────────────────────────── */
 
 .st-yes  { color: var(--green); }
@@ -900,6 +922,84 @@ tbody tr:last-child td { border-bottom: none; }
 }
 
 .empty-state i { font-size: 2rem; display: block; margin-bottom: 0.5rem; opacity: 0.4; }
+
+/* ── Modale ─────────────────────────────────────────── */
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background: rgba(15,23,42,0.45);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+}
+
+.modal-overlay.open { display: flex; animation: slide-down 0.2s var(--ease); }
+
+.modal {
+    width: 100%;
+    max-width: 420px;
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    animation: pop-in 0.25s var(--bounce);
+}
+
+.modal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.9rem 1.1rem;
+    background: linear-gradient(135deg, var(--blue) 0%, var(--blue-light) 100%);
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.98rem;
+}
+
+.modal-head i { opacity: 0.85; }
+
+.modal-close {
+    background: rgba(255,255,255,0.15);
+    border: none;
+    color: #fff;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.15s;
+    flex-shrink: 0;
+}
+
+.modal-close:hover { background: rgba(255,255,255,0.28); }
+
+.modal-body { padding: 1.25rem; }
+
+.modal-target {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--blue);
+    background: var(--blue-50);
+    padding: 0.45rem 0.75rem;
+    border-radius: var(--radius-xs);
+    margin-bottom: 1rem;
+    display: inline-block;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
 
 /* ── Grid ──────────────────────────────────────────── */
 

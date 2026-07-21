@@ -25,20 +25,28 @@
         {% if mannequins %}
         <div class="table-wrap">
             <table>
-                <thead><tr><th>Type</th><th>N°</th><th class="tc">Interv.</th><th>Lien</th><th class="tr">Actions</th></tr></thead>
+                <thead><tr><th>Type</th><th>N°</th><th>Statut</th><th class="tc">Interv.</th><th>Lien</th><th class="tr">Actions</th></tr></thead>
                 <tbody>
                     {% for m in mannequins %}
+                    {% set st = statuts.get(m.statut, statuts[default_statut]) %}
                     <tr>
                         <td><span class="badge badge-{{ m.type|lower }}">{{ m.type }}</span></td>
                         <td><strong>{{ m.numero }}</strong></td>
+                        <td><span class="badge-statut badge-statut-{{ st.classe }}"><i class="ti ti-{{ st.icon }}"></i> {{ st.label }}</span></td>
                         <td class="tc"><span class="pill">{{ m.nb_interventions }}</span></td>
                         <td><button class="btn btn-outline btn-sm" onclick="copyLink(this,'{{ m.type }}','{{ m.numero }}')"><i class="ti ti-link"></i> Copier</button></td>
                         <td>
                             <div class="actions">
-                                <a href="{{ url_for('admin_history', mannequin_id=m.id) }}" class="btn btn-outline btn-sm" data-c="blue"><i class="ti ti-history"></i></a>
-                                <a href="{{ url_for('admin_export_mannequin', mannequin_id=m.id) }}" class="btn btn-outline btn-sm" data-c="green"><i class="ti ti-file-spreadsheet"></i></a>
+                                <button type="button" class="btn btn-outline btn-sm btn-statut" data-c="blue"
+                                        data-action="{{ url_for('admin_update_statut', mannequin_id=m.id) }}"
+                                        data-label="{{ m.type }} N°{{ m.numero }}"
+                                        data-statut="{{ m.statut or default_statut }}"
+                                        data-detail="{{ m.statut_detail or '' }}"
+                                        title="Modifier le statut"><i class="ti ti-adjustments-alt"></i></button>
+                                <a href="{{ url_for('admin_history', mannequin_id=m.id) }}" class="btn btn-outline btn-sm" data-c="blue" title="Historique"><i class="ti ti-history"></i></a>
+                                <a href="{{ url_for('admin_export_mannequin', mannequin_id=m.id) }}" class="btn btn-outline btn-sm" data-c="green" title="Export Excel"><i class="ti ti-file-spreadsheet"></i></a>
                                 <form method="POST" action="{{ url_for('admin_delete_mannequin', mannequin_id=m.id) }}" style="display:inline;" onsubmit="return confirm('Supprimer ce mannequin et tout son historique ?')">
-                                    <button class="btn btn-outline btn-sm" data-c="red"><i class="ti ti-trash"></i></button>
+                                    <button class="btn btn-outline btn-sm" data-c="red" title="Supprimer"><i class="ti ti-trash"></i></button>
                                 </form>
                             </div>
                         </td>
@@ -84,6 +92,37 @@
         {% endif %}
     </div>
 </div>
+
+<!-- Modale de modification du statut -->
+<div class="modal-overlay" id="statutModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="statutModalTitle">
+        <div class="modal-head">
+            <span id="statutModalTitle"><i class="ti ti-adjustments-alt"></i> Modifier le statut</span>
+            <button type="button" class="modal-close" id="statutModalClose" aria-label="Fermer"><i class="ti ti-x"></i></button>
+        </div>
+        <form method="POST" id="statutForm" class="modal-body">
+            <p class="modal-target" id="statutTarget"></p>
+            <div class="field">
+                <label class="label">Statut <span class="req">*</span></label>
+                <select class="select" name="statut" id="statutSelect" required>
+                    {% for key, s in statuts.items() %}
+                    <option value="{{ key }}">{{ s.label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="field">
+                <label class="label">Complément d'information <span class="req" id="detailReq" style="display:none;">*</span></label>
+                <textarea class="textarea" name="statut_detail" id="statutDetail" rows="3"
+                          placeholder="Détail du défaut, précisions..."></textarea>
+                <p class="sig-hint" id="detailHint">Obligatoire uniquement si le statut est « Défaut signalé ».</p>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-outline btn-sm" id="statutCancel">Annuler</button>
+                <button type="submit" class="btn btn-primary btn-sm"><i class="ti ti-check"></i> Enregistrer</button>
+            </div>
+        </form>
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
@@ -98,5 +137,52 @@ function copyLink(btn, type, numero) {
         setTimeout(() => { btn.innerHTML = orig; btn.removeAttribute('data-c'); }, 1500);
     });
 }
+
+// ── Modale statut ──────────────────────────────────────────
+(function() {
+    const overlay = document.getElementById('statutModal');
+    const form = document.getElementById('statutForm');
+    const target = document.getElementById('statutTarget');
+    const select = document.getElementById('statutSelect');
+    const detail = document.getElementById('statutDetail');
+    const detailReq = document.getElementById('detailReq');
+
+    function updateRequired() {
+        const isDefaut = select.value === 'defaut';
+        detail.required = isDefaut;
+        detailReq.style.display = isDefaut ? '' : 'none';
+    }
+
+    function open(btn) {
+        form.action = btn.dataset.action;
+        target.textContent = btn.dataset.label;
+        select.value = btn.dataset.statut || 'operationnel';
+        detail.value = btn.dataset.detail || '';
+        updateRequired();
+        overlay.classList.add('open');
+        overlay.setAttribute('aria-hidden', 'false');
+        setTimeout(() => detail.focus(), 50);
+    }
+
+    function close() {
+        overlay.classList.remove('open');
+        overlay.setAttribute('aria-hidden', 'true');
+    }
+
+    document.querySelectorAll('.btn-statut').forEach(b => b.addEventListener('click', () => open(b)));
+    select.addEventListener('change', updateRequired);
+    document.getElementById('statutCancel').addEventListener('click', close);
+    document.getElementById('statutModalClose').addEventListener('click', close);
+    overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && overlay.classList.contains('open')) close(); });
+
+    form.addEventListener('submit', function(e) {
+        if (select.value === 'defaut' && !detail.value.trim()) {
+            e.preventDefault();
+            detail.focus();
+            alert('Veuillez décrire le défaut (complément d\'information obligatoire).');
+        }
+    });
+})();
 </script>
 {% endblock %}

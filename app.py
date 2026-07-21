@@ -44,6 +44,15 @@ else:
 MANNEQUIN_TYPES = ['Adulte', 'Enfant', 'Nourrisson']
 DEFAULT_ADMIN_PASSWORD = 'ALUPSAdmin'
 
+# Statuts possibles d'un mannequin (clé stockée en base -> affichage)
+STATUTS = {
+    'operationnel': {'label': 'Opérationnel',        'icon': 'circle-check-filled',  'classe': 'operationnel'},
+    'hors_service': {'label': 'Hors-Service',         'icon': 'circle-x-filled',      'classe': 'hs'},
+    'maintenance':  {'label': 'Maintenance en cours', 'icon': 'tool',                 'classe': 'maintenance'},
+    'defaut':       {'label': 'Défaut signalé',       'icon': 'alert-triangle-filled', 'classe': 'defaut'},
+}
+DEFAULT_STATUT = 'operationnel'
+
 
 # ── Database ──────────────────────────────────────────────
 
@@ -96,6 +105,18 @@ def init_db():
         conn.execute('ALTER TABLE interventions ADD COLUMN description_reparation TEXT DEFAULT ""')
     except sqlite3.OperationalError:
         pass  # Column already exists
+
+    # Statut des mannequins (migration additive, préserve l'existant)
+    for ddl in (
+        "ALTER TABLE mannequins ADD COLUMN statut TEXT DEFAULT 'operationnel'",
+        "ALTER TABLE mannequins ADD COLUMN statut_detail TEXT DEFAULT ''",
+        "ALTER TABLE mannequins ADD COLUMN statut_updated_at TIMESTAMP",
+    ):
+        try:
+            conn.execute(ddl)
+        except sqlite3.OperationalError:
+            pass  # Column already exists
+
     conn.commit()
     conn.close()
 
@@ -414,7 +435,9 @@ def admin_dashboard():
         'admin_dashboard.html',
         mannequins=mannequins,
         recent=recent,
-        types=MANNEQUIN_TYPES
+        types=MANNEQUIN_TYPES,
+        statuts=STATUTS,
+        default_statut=DEFAULT_STATUT
     )
 
 
@@ -445,6 +468,41 @@ def admin_add_mannequin():
     finally:
         conn.close()
 
+    return redirect(url_for('admin_dashboard'))
+
+
+@app.route('/admin/mannequins/<int:mannequin_id>/statut', methods=['POST'])
+@admin_required
+def admin_update_statut(mannequin_id):
+    statut = request.form.get('statut', '')
+    detail = request.form.get('statut_detail', '').strip()
+
+    if statut not in STATUTS:
+        flash('Statut invalide.', 'danger')
+        return redirect(url_for('admin_dashboard'))
+
+    if statut == 'defaut' and not detail:
+        flash('Veuillez décrire le défaut (complément d\'information obligatoire).', 'danger')
+        return redirect(url_for('admin_dashboard'))
+
+    conn = get_db()
+    mannequin = conn.execute(
+        'SELECT id FROM mannequins WHERE id = ?', (mannequin_id,)
+    ).fetchone()
+    if not mannequin:
+        conn.close()
+        flash('Mannequin introuvable.', 'danger')
+        return redirect(url_for('admin_dashboard'))
+
+    conn.execute(
+        '''UPDATE mannequins
+           SET statut = ?, statut_detail = ?, statut_updated_at = CURRENT_TIMESTAMP
+           WHERE id = ?''',
+        (statut, detail, mannequin_id)
+    )
+    conn.commit()
+    conn.close()
+    flash(f'Statut mis à jour : {STATUTS[statut]["label"]}.', 'success')
     return redirect(url_for('admin_dashboard'))
 
 
