@@ -1155,6 +1155,49 @@ tbody tr:last-child td { border-bottom: none; }
     margin-top: 1rem;
 }
 
+/* ── Options d'export ───────────────────────────────── */
+
+.export-options { display: flex; flex-direction: column; gap: 0.6rem; }
+
+.export-option {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 0.9rem;
+    border: 1.5px solid var(--g200);
+    border-radius: var(--radius-sm);
+    background: #fff;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.15s var(--ease);
+}
+
+.export-option:hover {
+    border-color: #059669;
+    background: var(--green-50);
+    box-shadow: var(--shadow-sm);
+}
+
+.export-option-ic {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-xs);
+    background: var(--green-50);
+    color: #059669;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.export-option-txt { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+.export-option-txt strong { font-size: 0.9rem; color: var(--g800); font-weight: 700; }
+.export-option-txt small { font-size: 0.76rem; color: var(--g500); }
+
+.export-option-dl { color: var(--g300); font-size: 1.15rem; flex-shrink: 0; }
+.export-option:hover .export-option-dl { color: #059669; }
+
 /* ── Grid ──────────────────────────────────────────── */
 
 @media (min-width: 900px) {

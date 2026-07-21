@@ -6,7 +6,7 @@
     <h1><i class="ti ti-dashboard"></i> Tableau de bord</h1>
     <div class="admin-bar-actions">
         <button type="button" class="btn btn-outline btn-sm" onclick="copyEtatLink(this)"><i class="ti ti-link"></i> Copier le lien public</button>
-        <a href="{{ url_for('admin_export') }}" class="btn btn-green"><i class="ti ti-file-spreadsheet"></i> Télécharger l'Excel complet</a>
+        <button type="button" class="btn btn-green" onclick="openExportModal()"><i class="ti ti-file-spreadsheet"></i> Télécharger l'Excel complet</button>
     </div>
 </div>
 
@@ -126,6 +126,39 @@
         </form>
     </div>
 </div>
+
+<!-- Modale de téléchargement de l'Excel -->
+<div class="modal-overlay" id="exportModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="exportModalTitle">
+        <div class="modal-head">
+            <span id="exportModalTitle"><i class="ti ti-file-spreadsheet"></i> Télécharger l'Excel complet</span>
+            <button type="button" class="modal-close" id="exportModalClose" aria-label="Fermer"><i class="ti ti-x"></i></button>
+        </div>
+        <div class="modal-body">
+            <p style="font-size:0.85rem; color:var(--g500); margin-bottom:0.9rem;">
+                Souhaitez-vous inclure les photos des interventions ? Elles augmentent la taille du fichier.
+            </p>
+            <div class="export-options">
+                <a href="{{ url_for('admin_export') }}" class="export-option" onclick="closeExportModal()">
+                    <span class="export-option-ic"><i class="ti ti-file-spreadsheet"></i></span>
+                    <span class="export-option-txt">
+                        <strong>Sans photos</strong>
+                        <small>Signatures uniquement · ~{{ export_size_sans }}</small>
+                    </span>
+                    <i class="ti ti-download export-option-dl"></i>
+                </a>
+                <a href="{{ url_for('admin_export') }}?photos=1" class="export-option" onclick="closeExportModal()">
+                    <span class="export-option-ic"><i class="ti ti-photo"></i></span>
+                    <span class="export-option-txt">
+                        <strong>Avec photos</strong>
+                        <small>Signatures + photos des interventions · ~{{ export_size_avec }}</small>
+                    </span>
+                    <i class="ti ti-download export-option-dl"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
@@ -150,6 +183,25 @@ function copyEtatLink(btn) {
         setTimeout(() => { btn.innerHTML = orig; btn.removeAttribute('data-c'); }, 1500);
     });
 }
+
+// ── Modale d'export Excel ──────────────────────────────────
+function openExportModal() {
+    const o = document.getElementById('exportModal');
+    o.classList.add('open');
+    o.setAttribute('aria-hidden', 'false');
+}
+function closeExportModal() {
+    const o = document.getElementById('exportModal');
+    o.classList.remove('open');
+    o.setAttribute('aria-hidden', 'true');
+}
+document.getElementById('exportModalClose').addEventListener('click', closeExportModal);
+document.getElementById('exportModal').addEventListener('click', e => {
+    if (e.target.id === 'exportModal') closeExportModal();
+});
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeExportModal();
+});
 
 // ── Modale statut ──────────────────────────────────────────
 (function() {

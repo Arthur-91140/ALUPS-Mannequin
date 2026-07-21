@@ -489,13 +489,17 @@ def admin_dashboard():
     ''').fetchall()
     conn.close()
 
+    size_sans, size_avec = _export_sizes()
+
     return render_template(
         'admin_dashboard.html',
         mannequins=mannequins,
         recent=recent,
         types=MANNEQUIN_TYPES,
         statuts=STATUTS,
-        default_statut=DEFAULT_STATUT
+        default_statut=DEFAULT_STATUT,
+        export_size_sans=_format_size(size_sans),
+        export_size_avec=_format_size(size_avec)
     )
 
 
@@ -703,182 +707,73 @@ def admin_delete_intervention(intervention_id):
 
 # ── Excel export ──────────────────────────────────────────
 
-@app.route('/admin/export')
-@admin_required
-def admin_export():
+def _format_size(n):
+    """Formatte une taille en octets de façon lisible (o / Ko / Mo)."""
+    if n < 1024:
+        return f"{n} o"
+    if n < 1024 * 1024:
+        return f"{n / 1024:.0f} Ko"
+    return f"{n / (1024 * 1024):.1f} Mo"
+
+
+def _export_sizes():
+    """Estime les tailles de l'export Excel complet, sans et avec photos (octets)."""
     conn = get_db()
-    interventions = conn.execute('''
-        SELECT i.*, m.numero as m_numero, m.type as m_type
-        FROM interventions i
-        JOIN mannequins m ON i.mannequin_id = m.id
-        ORDER BY i.date, m.type, m.numero
-    ''').fetchall()
+    signatures = conn.execute(
+        "SELECT signature_path FROM interventions WHERE signature_path IS NOT NULL"
+    ).fetchall()
+    photos = conn.execute("SELECT filename FROM photos").fetchall()
+    nb_inter = conn.execute("SELECT COUNT(*) FROM interventions").fetchone()[0]
     conn.close()
+
+    sig_bytes = 0
+    for s in signatures:
+        p = os.path.join(SIGNATURES_DIR, s['signature_path'])
+        if os.path.exists(p):
+            sig_bytes += os.path.getsize(p)
+
+    photo_bytes = 0
+    for ph in photos:
+        p = os.path.join(PHOTOS_DIR, ph['filename'])
+        if os.path.exists(p):
+            photo_bytes += os.path.getsize(p)
+
+    overhead = 6 * 1024 + 200 * nb_inter  # structure du .xlsx (approximatif)
+    sans = overhead + sig_bytes
+    avec = sans + photo_bytes
+    return sans, avec
+
+
+def _photos_by_intervention(conn, ids):
+    """Retourne {intervention_id: [filenames]} pour les interventions données."""
+    result = {}
+    if not ids:
+        return result
+    placeholders = ','.join('?' * len(ids))
+    rows = conn.execute(
+        f'SELECT intervention_id, filename FROM photos '
+        f'WHERE intervention_id IN ({placeholders}) ORDER BY id',
+        ids
+    ).fetchall()
+    for r in rows:
+        result.setdefault(r['intervention_id'], []).append(r['filename'])
+    return result
+
+
+def _build_tracabilite_xlsx(interventions, sheet_title, doc_title, photos_by_intervention=None):
+    """Construit le classeur de traçabilité. Si photos_by_intervention est fourni,
+    les photos des interventions sont intégrées dans des colonnes supplémentaires."""
+    with_photos = photos_by_intervention is not None
+    max_photos = 0
+    if with_photos:
+        max_photos = max((len(v) for v in photos_by_intervention.values()), default=0)
+    last_col = 12 + max_photos  # L = 12, puis une colonne par photo
+    last_letter = get_column_letter(last_col)
 
     wb = openpyxl.Workbook()
     ws = wb.active
-    ws.title = "Traçabilité"
+    ws.title = sheet_title[:31]  # nom d'onglet Excel limité à 31 caractères
 
-    # Styles
-    title_font = Font(name='Arial', size=14, bold=True)
-    header_font = Font(name='Arial', size=10, bold=True, color='FFFFFF')
-    header_fill = PatternFill(start_color='2C3E50', end_color='2C3E50', fill_type='solid')
-    sub_header_fill = PatternFill(start_color='34495E', end_color='34495E', fill_type='solid')
-    center = Alignment(horizontal='center', vertical='center', wrap_text=True)
-    left_center = Alignment(horizontal='left', vertical='center', wrap_text=True)
-    thin_border = Border(
-        left=Side(style='thin'),
-        right=Side(style='thin'),
-        top=Side(style='thin'),
-        bottom=Side(style='thin')
-    )
-
-    # Row 1: Title
-    ws.merge_cells('A1:L1')
-    ws['A1'] = 'REGISTRE DE TRAÇABILITÉ DES MANNEQUINS'
-    ws['A1'].font = title_font
-    ws['A1'].alignment = center
-    ws.row_dimensions[1].height = 35
-
-    # Row 2: Main headers
-    headers_row2 = {
-        'A': 'Date',
-        'B': 'Prénom',
-        'C': 'Nom',
-        'D': 'N° de mannequin',
-        'E': 'Nettoyage',
-        'G': 'Changement des poumons',
-        'I': 'Réparation',
-        'K': 'Informations à communiquer ?',
-        'L': 'Signature'
-    }
-
-    # Merge cells for row 2-3 headers
-    for col in ['A', 'B', 'C', 'D', 'K', 'L']:
-        ws.merge_cells(f'{col}2:{col}3')
-
-    ws.merge_cells('E2:F2')
-    ws.merge_cells('G2:H2')
-    ws.merge_cells('I2:J2')
-
-    for col, text in headers_row2.items():
-        cell = ws[f'{col}2']
-        cell.value = text
-        cell.font = header_font
-        cell.fill = header_fill
-        cell.alignment = center
-        cell.border = thin_border
-
-    # Row 3: Sub-headers (oui/non)
-    sub_headers = {'E': 'oui', 'F': 'non', 'G': 'oui', 'H': 'non', 'I': 'oui', 'J': 'non'}
-    for col, text in sub_headers.items():
-        cell = ws[f'{col}3']
-        cell.value = text
-        cell.font = Font(name='Arial', size=9, bold=True, color='FFFFFF')
-        cell.fill = sub_header_fill
-        cell.alignment = center
-        cell.border = thin_border
-
-    # Style remaining header cells
-    for row in [2, 3]:
-        for col_idx in range(1, 13):
-            cell = ws.cell(row=row, column=col_idx)
-            if cell.value is None and row == 2:
-                cell.fill = header_fill
-            if row == 3 and col_idx in [1, 2, 3, 4, 11, 12]:
-                cell.fill = header_fill
-            cell.border = thin_border
-
-    ws.row_dimensions[2].height = 30
-    ws.row_dimensions[3].height = 20
-
-    # Column widths
-    col_widths = {'A': 14, 'B': 14, 'C': 14, 'D': 20, 'E': 6, 'F': 6,
-                  'G': 6, 'H': 6, 'I': 6, 'J': 6, 'K': 28, 'L': 18}
-    for col, width in col_widths.items():
-        ws.column_dimensions[col].width = width
-
-    # Data rows
-    for idx, inter in enumerate(interventions):
-        row = idx + 4
-        ws.row_dimensions[row].height = 60  # Height for signature
-
-        data = [
-            inter['date'],
-            inter['prenom'],
-            inter['nom'],
-            f"{inter['m_type']} N°{inter['m_numero']}",
-            'X' if inter['nettoyage'] else '',
-            '' if inter['nettoyage'] else 'X',
-            'X' if inter['changement_poumons'] else '',
-            '' if inter['changement_poumons'] else 'X',
-            'X' if inter['reparation'] else '',
-            '' if inter['reparation'] else 'X',
-            inter['informations'] or '',
-        ]
-
-        for col_idx, value in enumerate(data, 1):
-            cell = ws.cell(row=row, column=col_idx, value=value)
-            cell.alignment = center if col_idx >= 5 else left_center
-            cell.border = thin_border
-            cell.font = Font(name='Arial', size=10)
-
-        # Signature cell border
-        ws.cell(row=row, column=12).border = thin_border
-
-        # Insert signature image
-        if inter['signature_path']:
-            sig_file = os.path.join(SIGNATURES_DIR, inter['signature_path'])
-            if os.path.exists(sig_file):
-                try:
-                    img = XlImage(sig_file)
-                    img.width = 120
-                    img.height = 50
-                    ws.add_image(img, f'L{row}')
-                except Exception:
-                    ws.cell(row=row, column=12, value='[signature]')
-
-    output = BytesIO()
-    wb.save(output)
-    output.seek(0)
-
-    filename = f"tracabilite_mannequins_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
-    return send_file(
-        output,
-        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        as_attachment=True,
-        download_name=filename
-    )
-
-
-@app.route('/admin/export/<int:mannequin_id>')
-@admin_required
-def admin_export_mannequin(mannequin_id):
-    """Export Excel for a single mannequin."""
-    conn = get_db()
-    mannequin = conn.execute(
-        'SELECT * FROM mannequins WHERE id = ?', (mannequin_id,)
-    ).fetchone()
-
-    if not mannequin:
-        flash('Mannequin introuvable.', 'danger')
-        conn.close()
-        return redirect(url_for('admin_dashboard'))
-
-    interventions = conn.execute('''
-        SELECT i.*, m.numero as m_numero, m.type as m_type
-        FROM interventions i
-        JOIN mannequins m ON i.mannequin_id = m.id
-        WHERE i.mannequin_id = ?
-        ORDER BY i.date
-    ''', (mannequin_id,)).fetchall()
-    conn.close()
-
-    wb = openpyxl.Workbook()
-    ws = wb.active
-    ws.title = f"{mannequin['type']} N°{mannequin['numero']}"
-
-    # Same styling as full export
     title_font = Font(name='Arial', size=14, bold=True)
     header_font = Font(name='Arial', size=10, bold=True, color='FFFFFF')
     header_fill = PatternFill(start_color='2C3E50', end_color='2C3E50', fill_type='solid')
@@ -890,18 +785,19 @@ def admin_export_mannequin(mannequin_id):
         top=Side(style='thin'), bottom=Side(style='thin')
     )
 
-    ws.merge_cells('A1:L1')
-    ws['A1'] = f"TRAÇABILITÉ — {mannequin['type']} N°{mannequin['numero']}"
+    # Ligne 1 : titre
+    ws.merge_cells(f'A1:{last_letter}1')
+    ws['A1'] = doc_title
     ws['A1'].font = title_font
     ws['A1'].alignment = center
     ws.row_dimensions[1].height = 35
 
+    # Lignes 2-3 : en-têtes
     headers_row2 = {
         'A': 'Date', 'B': 'Prénom', 'C': 'Nom', 'D': 'N° de mannequin',
         'E': 'Nettoyage', 'G': 'Changement des poumons',
         'I': 'Réparation', 'K': 'Informations à communiquer ?', 'L': 'Signature'
     }
-
     for col in ['A', 'B', 'C', 'D', 'K', 'L']:
         ws.merge_cells(f'{col}2:{col}3')
     ws.merge_cells('E2:F2')
@@ -934,6 +830,21 @@ def admin_export_mannequin(mannequin_id):
                 cell.fill = header_fill
             cell.border = thin_border
 
+    # En-tête "Photos" au-dessus des colonnes photos
+    if with_photos and max_photos > 0:
+        ws.merge_cells(f'M2:{last_letter}3')
+        cell = ws['M2']
+        cell.value = 'Photos'
+        cell.font = header_font
+        cell.fill = header_fill
+        cell.alignment = center
+        cell.border = thin_border
+        for col_idx in range(13, last_col + 1):
+            for r in (2, 3):
+                c = ws.cell(row=r, column=col_idx)
+                c.fill = header_fill
+                c.border = thin_border
+
     ws.row_dimensions[2].height = 30
     ws.row_dimensions[3].height = 20
 
@@ -941,10 +852,14 @@ def admin_export_mannequin(mannequin_id):
                   'G': 6, 'H': 6, 'I': 6, 'J': 6, 'K': 28, 'L': 18}
     for col, width in col_widths.items():
         ws.column_dimensions[col].width = width
+    for pj in range(max_photos):
+        ws.column_dimensions[get_column_letter(13 + pj)].width = 24
+
+    row_height = 72 if (with_photos and max_photos > 0) else 60
 
     for idx, inter in enumerate(interventions):
         row = idx + 4
-        ws.row_dimensions[row].height = 60
+        ws.row_dimensions[row].height = row_height
 
         data = [
             inter['date'], inter['prenom'], inter['nom'],
@@ -966,6 +881,7 @@ def admin_export_mannequin(mannequin_id):
 
         ws.cell(row=row, column=12).border = thin_border
 
+        # Signature
         if inter['signature_path']:
             sig_file = os.path.join(SIGNATURES_DIR, inter['signature_path'])
             if os.path.exists(sig_file):
@@ -977,11 +893,102 @@ def admin_export_mannequin(mannequin_id):
                 except Exception:
                     ws.cell(row=row, column=12, value='[signature]')
 
+        # Photos
+        if with_photos:
+            for pj, fname in enumerate(photos_by_intervention.get(inter['id'], [])):
+                pfile = os.path.join(PHOTOS_DIR, fname)
+                if not os.path.exists(pfile):
+                    continue
+                try:
+                    img = XlImage(pfile)
+                    target_h = 88
+                    if img.height:
+                        ratio = target_h / float(img.height)
+                        img.height = target_h
+                        img.width = int(img.width * ratio)
+                    if img.width > 150:
+                        ratio2 = 150 / float(img.width)
+                        img.width = 150
+                        img.height = int(img.height * ratio2)
+                    ws.add_image(img, f'{get_column_letter(13 + pj)}{row}')
+                except Exception:
+                    pass
+
     output = BytesIO()
     wb.save(output)
     output.seek(0)
+    return output
 
-    filename = f"tracabilite_{mannequin['type']}_N{mannequin['numero']}_{datetime.now().strftime('%Y%m%d')}.xlsx"
+
+@app.route('/admin/export')
+@admin_required
+def admin_export():
+    with_photos = request.args.get('photos') == '1'
+    conn = get_db()
+    interventions = conn.execute('''
+        SELECT i.*, m.numero as m_numero, m.type as m_type
+        FROM interventions i
+        JOIN mannequins m ON i.mannequin_id = m.id
+        ORDER BY i.date, m.type, m.numero
+    ''').fetchall()
+    photos_map = (
+        _photos_by_intervention(conn, [i['id'] for i in interventions])
+        if with_photos else None
+    )
+    conn.close()
+
+    output = _build_tracabilite_xlsx(
+        interventions, 'Traçabilité',
+        'REGISTRE DE TRAÇABILITÉ DES MANNEQUINS', photos_map
+    )
+
+    suffix = '_avec_photos' if with_photos else ''
+    filename = f"tracabilite_mannequins{suffix}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+    return send_file(
+        output,
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        as_attachment=True,
+        download_name=filename
+    )
+
+
+@app.route('/admin/export/<int:mannequin_id>')
+@admin_required
+def admin_export_mannequin(mannequin_id):
+    """Export Excel for a single mannequin."""
+    with_photos = request.args.get('photos') == '1'
+    conn = get_db()
+    mannequin = conn.execute(
+        'SELECT * FROM mannequins WHERE id = ?', (mannequin_id,)
+    ).fetchone()
+
+    if not mannequin:
+        flash('Mannequin introuvable.', 'danger')
+        conn.close()
+        return redirect(url_for('admin_dashboard'))
+
+    interventions = conn.execute('''
+        SELECT i.*, m.numero as m_numero, m.type as m_type
+        FROM interventions i
+        JOIN mannequins m ON i.mannequin_id = m.id
+        WHERE i.mannequin_id = ?
+        ORDER BY i.date
+    ''', (mannequin_id,)).fetchall()
+    photos_map = (
+        _photos_by_intervention(conn, [i['id'] for i in interventions])
+        if with_photos else None
+    )
+    conn.close()
+
+    output = _build_tracabilite_xlsx(
+        interventions,
+        f"{mannequin['type']} N°{mannequin['numero']}",
+        f"TRAÇABILITÉ — {mannequin['type']} N°{mannequin['numero']}",
+        photos_map
+    )
+
+    suffix = '_avec_photos' if with_photos else ''
+    filename = f"tracabilite_{mannequin['type']}_N{mannequin['numero']}{suffix}_{datetime.now().strftime('%Y%m%d')}.xlsx"
     return send_file(
         output,
         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
