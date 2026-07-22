@@ -11,6 +11,10 @@
 <body>
     <div class="topbar">
         <img src="{{ url_for('static', filename='img/logo.png') }}" alt="ALUPS" class="topbar-logo">
+        <button type="button" class="nav-toggle" aria-label="Menu" aria-expanded="false">
+            <i class="ti ti-menu-2 nav-ic-open"></i>
+            <i class="ti ti-x nav-ic-close"></i>
+        </button>
         {% block topbar_right %}{% endblock %}
     </div>
 
@@ -26,6 +30,7 @@
 
     {% block content %}{% endblock %}
     {% block scripts %}{% endblock %}
+    {% include '_nav_script.html' %}
     {% include '_pwa_register.html' %}
 </body>
 </html>

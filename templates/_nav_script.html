@@ -1,0 +1,32 @@
+<script>
+(function () {
+    var topbar = document.querySelector('.topbar');
+    var toggle = topbar && topbar.querySelector('.nav-toggle');
+    if (!topbar || !toggle) return;
+
+    // Aucune navigation à replier (ex. page de connexion) : pas de hamburger
+    if (!topbar.querySelector('.topbar-right')) { toggle.style.display = 'none'; return; }
+
+    function close() {
+        topbar.classList.remove('nav-open');
+        toggle.setAttribute('aria-expanded', 'false');
+    }
+
+    toggle.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var open = topbar.classList.toggle('nav-open');
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+
+    // Fermer en cliquant en dehors ou sur un lien du menu
+    document.addEventListener('click', function (e) {
+        if (!topbar.classList.contains('nav-open')) return;
+        if (!topbar.contains(e.target) || e.target.closest('.topbar-right a')) close();
+    });
+
+    // Fermer avec Échap
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') close();
+    });
+})();
+</script>

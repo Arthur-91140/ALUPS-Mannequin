@@ -107,6 +107,25 @@ img { max-width: 100%; display: block; }
     text-transform: uppercase;
 }
 
+/* Bouton hamburger : masqué sur grand écran, visible sur téléphone */
+.nav-toggle {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: 1.5px solid var(--g200);
+    border-radius: var(--radius-sm);
+    background: #fff;
+    color: var(--blue);
+    font-size: 1.4rem;
+    cursor: pointer;
+    transition: background 0.15s var(--ease), border-color 0.15s var(--ease);
+}
+.nav-toggle:hover { background: var(--blue-50); border-color: var(--blue-100); }
+.nav-toggle i { display: block; line-height: 1; }
+.nav-ic-close { display: none; }
+
 /* ── Buttons ───────────────────────────────────────── */
 
 .btn {
@@ -1239,11 +1258,42 @@ body { overflow-x: hidden; }
     .btn-sm { min-height: 36px; }
 }
 
-/* Barre supérieure : navigation en icônes seules quand la place manque */
+/* Barre supérieure : navigation repliée dans un menu hamburger sur téléphone */
 @media (max-width: 720px) {
-    .topbar-right .btn .btn-label { display: none; }
-    .topbar-right .btn.btn-sm { padding: 0.45rem 0.6rem; }
-    .topbar-right { gap: 0.4rem; }
+    .topbar { position: sticky; }
+    .nav-toggle { display: inline-flex; }
+    .topbar.nav-open .nav-ic-open { display: none; }
+    .topbar.nav-open .nav-ic-close { display: block; }
+
+    .topbar-right {
+        display: none;
+        position: absolute;
+        top: calc(100% + 3px);
+        right: max(0.75rem, env(safe-area-inset-right));
+        left: max(0.75rem, env(safe-area-inset-left));
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.4rem;
+        padding: 0.5rem;
+        background: rgba(255,255,255,0.98);
+        backdrop-filter: blur(24px) saturate(180%);
+        -webkit-backdrop-filter: blur(24px) saturate(180%);
+        border: 1.5px solid var(--g200);
+        border-radius: var(--radius);
+        box-shadow: 0 12px 30px rgba(27,58,107,0.16);
+        z-index: 99;
+    }
+    .topbar.nav-open .topbar-right { display: flex; }
+
+    /* Éléments du menu en pleine largeur, avec libellés visibles */
+    .topbar-right .btn {
+        width: 100%;
+        justify-content: flex-start;
+        padding: 0.7rem 0.85rem;
+        font-size: 0.95rem;
+    }
+    .topbar-right .btn .btn-label { display: inline; }
+    .topbar-right .btn i { font-size: 1.15rem; }
 }
 
 @media (max-width: 600px) {
@@ -1254,10 +1304,8 @@ body { overflow-x: hidden; }
         min-height: 56px;
         padding-top: 0.4rem;
         padding-bottom: 0.4rem;
-        flex-wrap: wrap;
     }
     .topbar-logo { height: 38px; }
-    .topbar-right { flex-wrap: wrap; justify-content: flex-end; }
 
     .page-center { padding: 0 0 2rem; }
     .page-center .card {
