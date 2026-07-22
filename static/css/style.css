@@ -428,7 +428,7 @@ tbody tr:last-child td { border-bottom: none; }
     margin-left: 0.5rem;
 }
 
-.fgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+.fgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.9rem; }
 .fgrid .field { margin-bottom: 0; }
 
 .fdiv { height: 1px; background: var(--g100); margin: 1.3rem 0; }
