@@ -1307,13 +1307,19 @@ body { overflow-x: hidden; }
     }
     .topbar-logo { height: 38px; }
 
-    .page-center { padding: 0 0 2rem; }
+    /* Carte flottante, bien détachée de la topbar (plutôt qu'un bloc pleine largeur collé) */
+    .page-center { padding: 0.85rem 0.7rem 2rem; }
     .page-center .card {
-        border-radius: 0;
-        box-shadow: none;
-        border-left: 0;
-        border-right: 0;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
     }
+
+    /* En-tête de carte plus léger sur téléphone */
+    .card-head {
+        padding: 0.85rem 1rem;
+        font-size: 1rem;
+    }
+    .card-head i { font-size: 1.1rem; }
 
     .card-body { padding: 1.25rem 1rem; }
 
