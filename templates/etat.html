@@ -61,8 +61,6 @@
                     {% if m.statut_updated_at %}
                     {% set d = m.statut_updated_at[:10].split('-') %}
                     <span class="etat-updated"><i class="ti ti-clock"></i> Mis à jour le {{ d[2] }}/{{ d[1] }}/{{ d[0] }}</span>
-                    {% else %}
-                    <span></span>
                     {% endif %}
                     <a href="{{ url_for('formulaire', type=m.type, numero=m.numero) }}" class="btn btn-outline btn-sm" data-c="blue">
                         <i class="ti ti-clipboard-plus"></i> Faire un suivi
