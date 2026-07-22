@@ -123,8 +123,9 @@ img { max-width: 100%; display: block; }
     transition: background 0.15s var(--ease), border-color 0.15s var(--ease);
 }
 .nav-toggle:hover { background: var(--blue-50); border-color: var(--blue-100); }
-.nav-toggle i { display: block; line-height: 1; }
-.nav-ic-close { display: none; }
+.nav-toggle i { line-height: 1; }
+.nav-toggle .nav-ic-open { display: block; }
+.nav-toggle .nav-ic-close { display: none; }
 
 /* ── Buttons ───────────────────────────────────────── */
 
@@ -1262,8 +1263,8 @@ body { overflow-x: hidden; }
 @media (max-width: 720px) {
     .topbar { position: sticky; }
     .nav-toggle { display: inline-flex; }
-    .topbar.nav-open .nav-ic-open { display: none; }
-    .topbar.nav-open .nav-ic-close { display: block; }
+    .topbar.nav-open .nav-toggle .nav-ic-open { display: none; }
+    .topbar.nav-open .nav-toggle .nav-ic-close { display: block; }
 
     .topbar-right {
         display: none;
