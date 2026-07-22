@@ -1262,6 +1262,87 @@ tbody tr:last-child td { border-bottom: none; }
 .export-option-dl { color: var(--g300); font-size: 1.15rem; flex-shrink: 0; }
 .export-option:hover .export-option-dl { color: #059669; }
 
+/* ── Cartes de données (affichage mobile des tableaux admin) ── */
+
+.admin-cards {
+    display: none;
+    flex-direction: column;
+    gap: 0.7rem;
+}
+
+.data-card {
+    background: #fff;
+    border: 1px solid var(--g200);
+    border-radius: var(--radius-sm);
+    padding: 0.9rem;
+    box-shadow: var(--shadow-xs);
+}
+
+.data-card--link {
+    cursor: pointer;
+    transition: background 0.15s var(--ease), box-shadow 0.15s var(--ease);
+}
+.data-card--link:active { background: var(--blue-50); box-shadow: var(--shadow-sm); }
+
+.data-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+}
+
+.data-card-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 700;
+    color: var(--g800);
+    min-width: 0;
+}
+.data-card-title i { color: var(--blue); }
+.data-card-title strong { font-size: 1.05rem; }
+
+.data-card-date {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--g500);
+    white-space: nowrap;
+}
+
+.data-card-meta {
+    margin-top: 0.55rem;
+    font-size: 0.82rem;
+    color: var(--g500);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+}
+.data-card-meta i { color: var(--g400); }
+
+.data-card-chips {
+    margin-top: 0.6rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.data-card-actions {
+    margin-top: 0.75rem;
+    padding-top: 0.7rem;
+    border-top: 1px solid var(--g100);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+.data-card-actions .btn {
+    min-height: 40px;
+    min-width: 40px;
+    justify-content: center;
+}
+.data-card-actions form { display: inline-flex; }
+
 /* ── Grid ──────────────────────────────────────────── */
 
 @media (min-width: 900px) {
@@ -1306,6 +1387,10 @@ body { overflow-x: hidden; }
 @media (max-width: 720px) {
     .topbar { position: sticky; }
     .nav-toggle { display: inline-flex; }
+
+    /* Tableaux admin remplacés par des cartes tactiles sur téléphone */
+    .admin-table { display: none; }
+    .admin-cards { display: flex; }
     .topbar.nav-open .nav-toggle .nav-ic-open { display: none; }
     .topbar.nav-open .nav-toggle .nav-ic-close { display: block; }
 

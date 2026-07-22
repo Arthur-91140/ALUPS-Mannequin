@@ -19,7 +19,7 @@
     <p class="section-head"><i class="ti ti-list"></i> {{ interventions|length }} intervention(s)</p>
 
     {% if interventions %}
-    <div class="table-wrap">
+    <div class="table-wrap admin-table">
         <table>
             <thead><tr><th>Date</th><th>Prénom</th><th>Nom</th><th class="tc">Nettoyage</th><th class="tc">Poumons</th><th class="tc">Réparation</th><th class="tc">Photos</th><th class="tr">Actions</th></tr></thead>
             <tbody>
@@ -40,6 +40,29 @@
                 {% endfor %}
             </tbody>
         </table>
+    </div>
+
+    <div class="admin-cards">
+        {% for i in interventions %}
+        <div class="data-card data-card--link" onclick="window.location='{{ url_for('admin_intervention_detail', intervention_id=i.id) }}'">
+            <div class="data-card-head">
+                <span class="data-card-title"><i class="ti ti-calendar-event"></i> {{ i.date }}</span>
+                <span onclick="event.stopPropagation()">
+                    <form method="POST" action="{{ url_for('admin_delete_intervention', intervention_id=i.id) }}" onsubmit="return confirm('Supprimer cette intervention ?')">
+                        <button class="btn btn-outline btn-sm" data-c="red"><i class="ti ti-trash"></i></button>
+                    </form>
+                </span>
+            </div>
+            <div class="data-card-meta"><i class="ti ti-user"></i> {{ i.prenom }} {{ i.nom }}</div>
+            <div class="data-card-chips">
+                {% if i.nettoyage %}<span class="detail-tag tag-green"><i class="ti ti-circle-check"></i> Nettoyage</span>{% else %}<span class="detail-tag tag-gray"><i class="ti ti-circle-x"></i> Nettoyage</span>{% endif %}
+                {% if i.changement_poumons %}<span class="detail-tag tag-green"><i class="ti ti-circle-check"></i> Poumons</span>{% else %}<span class="detail-tag tag-gray"><i class="ti ti-circle-x"></i> Poumons</span>{% endif %}
+                {% if i.reparation %}<span class="detail-tag tag-red"><i class="ti ti-alert-triangle"></i> Réparation</span>{% else %}<span class="detail-tag tag-green"><i class="ti ti-circle-check"></i> Réparation</span>{% endif %}
+                {% set nb = photos_by_intervention.get(i.id, [])|length %}
+                {% if nb %}<span class="detail-tag tag-gray"><i class="ti ti-camera"></i> {{ nb }} photo{{ 's' if nb != 1 else '' }}</span>{% endif %}
+            </div>
+        </div>
+        {% endfor %}
     </div>
     {% else %}
     <div class="empty-state">
