@@ -1,6 +1,17 @@
 {% extends "base.html" %}
 {% block title %}Connexion admin{% endblock %}
 
+{% block topbar_right %}
+<div class="topbar-right">
+    <a href="{{ url_for('formulaire') }}" class="btn btn-outline btn-sm" data-c="blue" title="Formulaire de suivi">
+        <i class="ti ti-clipboard-heart"></i> <span class="btn-label">Formulaire de suivi</span>
+    </a>
+    <a href="{{ url_for('etat') }}" class="btn btn-outline btn-sm" data-c="blue" title="État des mannequins">
+        <i class="ti ti-activity-heartbeat"></i> <span class="btn-label">État des mannequins</span>
+    </a>
+</div>
+{% endblock %}
+
 {% block content %}
 <div class="auth-page">
     <div class="auth-box card">
