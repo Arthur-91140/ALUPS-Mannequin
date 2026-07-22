@@ -71,7 +71,7 @@ DEFAULT_STATUT = 'operationnel'
 
 # Types de formation possibles pour une intervention (clé stockée -> libellé)
 TYPES_FORMATION = {
-    'psc':       'PSC (formation de base)',
+    'psc':       'PSC',
     'revisions': 'Révisions',
     'pse':       'PSE',
     'autre':     'Autre',
