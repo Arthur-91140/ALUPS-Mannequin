@@ -1351,14 +1351,24 @@ tbody tr:last-child td { border-bottom: none; }
 
 /* ── Grid ──────────────────────────────────────────── */
 
-@media (min-width: 900px) {
+/* Tableau de bord : conteneur un peu plus large pour laisser la place aux
+   deux tableaux côte à côte tout en restant centré. */
+.admin-content--wide { max-width: 1320px; }
+
+/* Deux panneaux côte à côte UNIQUEMENT quand il y a assez de place pour les
+   deux tableaux ; en dessous, ils s'empilent en pleine largeur (le tableau
+   des mannequins dispose alors de toute la largeur, sans débordement). */
+@media (min-width: 1300px) {
     .admin-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 1.5rem;
         align-items: stretch;
     }
-    .admin-grid > .section { margin-bottom: 0; }
+    /* min-width:0 : les colonnes gardent une largeur égale et un tableau
+       large ne peut plus étirer son panneau (donc pas de débordement de
+       page, blocs centrés et de largeur constante). */
+    .admin-grid > .section { margin-bottom: 0; min-width: 0; }
     .admin-grid > .section-full { grid-column: 1 / -1; }
 }
 

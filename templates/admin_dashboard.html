@@ -1,5 +1,6 @@
 {% extends "base_admin.html" %}
 {% block title %}Tableau de bord{% endblock %}
+{% block content_class %}admin-content--wide{% endblock %}
 
 {% block content %}
 <div class="admin-bar">
@@ -42,7 +43,7 @@
                         <td><strong>{{ m.numero }}</strong></td>
                         <td><span class="badge-statut badge-statut-{{ st.classe }}"><i class="ti ti-{{ st.icon }}"></i> {{ st.label }}</span></td>
                         <td class="tc"><span class="pill">{{ m.nb_interventions }}</span></td>
-                        <td><button class="btn btn-outline btn-sm" onclick="copyLink(this,'{{ m.type }}','{{ m.numero }}')"><i class="ti ti-link"></i> Copier</button></td>
+                        <td><button class="btn btn-outline btn-sm" onclick="copyLink(this,'{{ m.type }}','{{ m.numero }}')" title="Copier le lien public"><i class="ti ti-link"></i></button></td>
                         <td>
                             <div class="actions">
                                 <button type="button" class="btn btn-outline btn-sm btn-statut" data-c="blue"
