@@ -2,7 +2,7 @@
    Servi par Flask afin que les chemins respectent le sous-dossier de
    déploiement. Bump CACHE pour forcer la mise à jour du cache. */
 
-const CACHE = 'alups-v5';
+const CACHE = 'alups-v6';
 const OFFLINE_URL = '{{ url_for("offline") }}';
 const STATIC_PREFIX = '{{ url_for("static", filename="") }}';
 
