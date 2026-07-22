@@ -1269,7 +1269,7 @@ body { overflow-x: hidden; }
     .topbar-right {
         display: none;
         position: absolute;
-        top: calc(100% + 3px);
+        top: calc(100% + 0.9rem);
         right: max(0.75rem, env(safe-area-inset-right));
         left: max(0.75rem, env(safe-area-inset-left));
         flex-direction: column;
