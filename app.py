@@ -2,7 +2,7 @@ import os
 import uuid
 import base64
 import sqlite3
-from datetime import datetime
+from datetime import datetime, timedelta
 from functools import wraps
 from io import BytesIO
 
@@ -40,6 +40,9 @@ else:
     app.secret_key = os.urandom(32)
     with open(SECRET_KEY_FILE, 'wb') as f:
         f.write(app.secret_key)
+
+# Durée de la session « se souvenir de moi »
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=30)
 
 MANNEQUIN_TYPES = ['Homme', 'Femme', 'Enfant', 'Nourrisson']
 DEFAULT_ADMIN_PASSWORD = 'ALUPSAdmin'
@@ -446,6 +449,8 @@ def admin_login():
 
         if valid:
             session['admin_logged_in'] = True
+            # Se souvenir de moi : session persistante (30 j) sinon expire à la fermeture
+            session.permanent = bool(request.form.get('remember'))
             return redirect(url_for('admin_dashboard'))
         else:
             flash('Mot de passe incorrect.', 'danger')
