@@ -215,6 +215,42 @@ document.addEventListener('DOMContentLoaded', function() {
     intervenantSelect.addEventListener('change', toggleManual);
     toggleManual();
 
+    // ── Mémoriser le dernier intervenant sur cet appareil ──────
+    const LS_INTERVENANT = 'alups_last_intervenant';
+    function saveIntervenant() {
+        try {
+            const val = intervenantSelect.value;
+            if (!val) return;
+            const data = { id: val };
+            if (val === 'manual') {
+                data.prenom = prenomInput.value.trim();
+                data.nom = nomInput.value.trim();
+            } else {
+                data.label = intervenantSelect.options[intervenantSelect.selectedIndex].textContent.trim();
+            }
+            localStorage.setItem(LS_INTERVENANT, JSON.stringify(data));
+        } catch (e) {}
+    }
+    function restoreIntervenant() {
+        if (intervenantSelect.value) return; // déjà pré-sélectionné (ex. erreur de validation)
+        let data;
+        try { data = JSON.parse(localStorage.getItem(LS_INTERVENANT) || 'null'); } catch (e) { return; }
+        if (!data) return;
+        if (data.id === 'manual') {
+            intervenantSelect.value = 'manual';
+            prenomInput.value = data.prenom || '';
+            nomInput.value = data.nom || '';
+            toggleManual();
+            return;
+        }
+        // L'intervenant a pu être supprimé : vérifier par id, sinon retomber sur le nom
+        const opts = Array.from(intervenantSelect.options);
+        let opt = opts.find(o => o.value === data.id);
+        if (!opt && data.label) opt = opts.find(o => o.textContent.trim() === data.label);
+        if (opt) intervenantSelect.value = opt.value;
+    }
+    restoreIntervenant();
+
     // Show/hide repair description
     const repField = document.getElementById('reparationDescField');
     const repDesc = document.getElementById('descReparation');
@@ -239,6 +275,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('mainForm').addEventListener('submit', function(e) {
         if (pad.isEmpty()) { e.preventDefault(); alert('Veuillez signer le formulaire.'); return; }
         document.getElementById('signatureData').value = pad.toDataURL('image/png');
+        saveIntervenant();
     });
 
     // Photo management
