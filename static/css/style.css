@@ -907,8 +907,8 @@ tbody tr:last-child td { border-bottom: none; }
 
 .etat-card-foot {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    align-items: flex-start;
+    justify-content: flex-start;
     gap: 0.5rem;
     margin-top: auto;
     padding-top: 0.7rem;
