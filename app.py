@@ -69,6 +69,30 @@ STATUTS = {
 }
 DEFAULT_STATUT = 'operationnel'
 
+# Types de formation possibles pour une intervention (clé stockée -> libellé)
+TYPES_FORMATION = {
+    'psc':       'PSC (formation de base)',
+    'revisions': 'Révisions',
+    'pse':       'PSE',
+    'autre':     'Autre',
+}
+DEFAULT_TYPE_FORMATION = 'psc'
+
+
+def formation_label(row):
+    """Libellé lisible du type de formation d'une intervention (ligne DB).
+    Pour « Autre », ajoute la précision saisie si elle existe."""
+    keys = row.keys() if hasattr(row, 'keys') else row
+    key = (row['type_formation'] if 'type_formation' in keys else '') or ''
+    if key == 'autre':
+        precision = (row['type_formation_autre'] if 'type_formation_autre' in keys else '') or ''
+        return f'Autre — {precision}' if precision else 'Autre'
+    return TYPES_FORMATION.get(key, '')
+
+
+# Rendre le libellé de formation disponible dans les templates
+app.jinja_env.globals['formation_label'] = formation_label
+
 
 # ── Database ──────────────────────────────────────────────
 
@@ -128,6 +152,16 @@ def init_db():
         conn.execute('ALTER TABLE interventions ADD COLUMN description_reparation TEXT DEFAULT ""')
     except sqlite3.OperationalError:
         pass  # Column already exists
+
+    # Type de formation de l'intervention (migration additive, préserve l'existant)
+    for ddl in (
+        "ALTER TABLE interventions ADD COLUMN type_formation TEXT DEFAULT 'psc'",
+        "ALTER TABLE interventions ADD COLUMN type_formation_autre TEXT DEFAULT ''",
+    ):
+        try:
+            conn.execute(ddl)
+        except sqlite3.OperationalError:
+            pass  # Column already exists
 
     # Statut des mannequins (migration additive, préserve l'existant)
     for ddl in (
@@ -261,6 +295,8 @@ def formulaire():
         mannequins=mannequins,
         intervenants=get_intervenants_ordered(),
         types=MANNEQUIN_TYPES,
+        types_formation=TYPES_FORMATION,
+        default_type_formation=DEFAULT_TYPE_FORMATION,
         pre_type=pre_type,
         pre_numero=pre_numero,
         pre_mannequin_id=pre_mannequin_id,
@@ -287,6 +323,8 @@ def formulaire_submit():
         if iv:
             prenom, nom = iv['prenom'], iv['nom']
 
+    type_formation = request.form.get('type_formation', '')
+    type_formation_autre = request.form.get('type_formation_autre', '').strip()
     nettoyage = request.form.get('nettoyage')
     changement_poumons = request.form.get('changement_poumons')
     reparation = request.form.get('reparation')
@@ -304,6 +342,10 @@ def formulaire_submit():
         errors.append('Veuillez indiquer votre prénom.')
     if not nom:
         errors.append('Veuillez indiquer votre nom.')
+    if type_formation not in TYPES_FORMATION:
+        errors.append('Veuillez indiquer le type de formation.')
+    if type_formation == 'autre' and not type_formation_autre:
+        errors.append('Veuillez préciser le type de formation.')
     if nettoyage not in ('oui', 'non'):
         errors.append('Veuillez indiquer si un nettoyage a été effectué.')
     if changement_poumons not in ('oui', 'non'):
@@ -328,6 +370,8 @@ def formulaire_submit():
             mannequins=mannequins,
             intervenants=get_intervenants_ordered(),
             types=MANNEQUIN_TYPES,
+            types_formation=TYPES_FORMATION,
+            default_type_formation=DEFAULT_TYPE_FORMATION,
             pre_type=request.form.get('type_select', ''),
             pre_numero=request.form.get('numero_select', ''),
             pre_mannequin_id=mannequin_id,
@@ -350,11 +394,14 @@ def formulaire_submit():
     conn = get_db()
     cursor = conn.execute(
         '''INSERT INTO interventions
-           (mannequin_id, date, prenom, nom, nettoyage, changement_poumons,
+           (mannequin_id, date, prenom, nom, type_formation, type_formation_autre,
+            nettoyage, changement_poumons,
             reparation, description_reparation, informations, signature_path)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
         (
             mannequin_id, date, prenom, nom,
+            type_formation,
+            type_formation_autre if type_formation == 'autre' else '',
             1 if nettoyage == 'oui' else 0,
             1 if changement_poumons == 'oui' else 0,
             1 if reparation == 'oui' else 0,
@@ -942,7 +989,7 @@ def _build_tracabilite_xlsx(interventions, sheet_title, doc_title, photos_by_int
     max_photos = 0
     if with_photos:
         max_photos = max((len(v) for v in photos_by_intervention.values()), default=0)
-    last_col = 12 + max_photos  # L = 12, puis une colonne par photo
+    last_col = 13 + max_photos  # M = 13 (type de formation), puis une colonne par photo
     last_letter = get_column_letter(last_col)
 
     wb = openpyxl.Workbook()
@@ -971,9 +1018,10 @@ def _build_tracabilite_xlsx(interventions, sheet_title, doc_title, photos_by_int
     headers_row2 = {
         'A': 'Date', 'B': 'Prénom', 'C': 'Nom', 'D': 'N° de mannequin',
         'E': 'Nettoyage', 'G': 'Changement des poumons',
-        'I': 'Réparation', 'K': 'Informations à communiquer ?', 'L': 'Signature'
+        'I': 'Réparation', 'K': 'Informations à communiquer ?', 'L': 'Signature',
+        'M': 'Type de formation'
     }
-    for col in ['A', 'B', 'C', 'D', 'K', 'L']:
+    for col in ['A', 'B', 'C', 'D', 'K', 'L', 'M']:
         ws.merge_cells(f'{col}2:{col}3')
     ws.merge_cells('E2:F2')
     ws.merge_cells('G2:H2')
@@ -997,24 +1045,24 @@ def _build_tracabilite_xlsx(interventions, sheet_title, doc_title, photos_by_int
         cell.border = thin_border
 
     for row in [2, 3]:
-        for col_idx in range(1, 13):
+        for col_idx in range(1, 14):
             cell = ws.cell(row=row, column=col_idx)
             if cell.value is None and row == 2:
                 cell.fill = header_fill
-            if row == 3 and col_idx in [1, 2, 3, 4, 11, 12]:
+            if row == 3 and col_idx in [1, 2, 3, 4, 11, 12, 13]:
                 cell.fill = header_fill
             cell.border = thin_border
 
-    # En-tête "Photos" au-dessus des colonnes photos
+    # En-tête "Photos" au-dessus des colonnes photos (à partir de la colonne N)
     if with_photos and max_photos > 0:
-        ws.merge_cells(f'M2:{last_letter}3')
-        cell = ws['M2']
+        ws.merge_cells(f'N2:{last_letter}3')
+        cell = ws['N2']
         cell.value = 'Photos'
         cell.font = header_font
         cell.fill = header_fill
         cell.alignment = center
         cell.border = thin_border
-        for col_idx in range(13, last_col + 1):
+        for col_idx in range(14, last_col + 1):
             for r in (2, 3):
                 c = ws.cell(row=r, column=col_idx)
                 c.fill = header_fill
@@ -1024,11 +1072,11 @@ def _build_tracabilite_xlsx(interventions, sheet_title, doc_title, photos_by_int
     ws.row_dimensions[3].height = 20
 
     col_widths = {'A': 14, 'B': 14, 'C': 14, 'D': 20, 'E': 6, 'F': 6,
-                  'G': 6, 'H': 6, 'I': 6, 'J': 6, 'K': 28, 'L': 18}
+                  'G': 6, 'H': 6, 'I': 6, 'J': 6, 'K': 28, 'L': 18, 'M': 22}
     for col, width in col_widths.items():
         ws.column_dimensions[col].width = width
     for pj in range(max_photos):
-        ws.column_dimensions[get_column_letter(13 + pj)].width = 24
+        ws.column_dimensions[get_column_letter(14 + pj)].width = 24
 
     row_height = 72 if (with_photos and max_photos > 0) else 60
 
@@ -1055,6 +1103,12 @@ def _build_tracabilite_xlsx(interventions, sheet_title, doc_title, photos_by_int
             cell.font = Font(name='Arial', size=10)
 
         ws.cell(row=row, column=12).border = thin_border
+
+        # Type de formation (colonne M)
+        fcell = ws.cell(row=row, column=13, value=formation_label(inter))
+        fcell.alignment = left_center
+        fcell.border = thin_border
+        fcell.font = Font(name='Arial', size=10)
 
         # Signature
         if inter['signature_path']:
@@ -1085,7 +1139,7 @@ def _build_tracabilite_xlsx(interventions, sheet_title, doc_title, photos_by_int
                         ratio2 = 150 / float(img.width)
                         img.width = 150
                         img.height = int(img.height * ratio2)
-                    ws.add_image(img, f'{get_column_letter(13 + pj)}{row}')
+                    ws.add_image(img, f'{get_column_letter(14 + pj)}{row}')
                 except Exception:
                     pass
 

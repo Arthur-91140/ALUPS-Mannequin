@@ -41,6 +41,22 @@
                     </div>
                 </div>
 
+                <div class="field">
+                    <label class="label">Type de formation <span class="req">*</span></label>
+                    <select class="select" id="formation_select" name="type_formation" required>
+                        {% for key, label in types_formation.items() %}
+                        <option value="{{ key }}"
+                            {% if (form_data and form_data.type_formation == key) or (not form_data and default_type_formation == key) %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="field" id="formationAutreField" style="display:none;">
+                    <label class="label">Précisez <span class="req">*</span></label>
+                    <input type="text" class="input" name="type_formation_autre" id="formationAutreInput"
+                           value="{{ form_data.type_formation_autre if form_data else '' }}"
+                           placeholder="Précisez le type de formation">
+                </div>
+
                 <div class="fdiv"></div>
 
                 <p class="fsec"><i class="ti ti-user"></i> Intervenant</p>
@@ -262,6 +278,19 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     document.querySelectorAll('input[name="reparation"]').forEach(r => r.addEventListener('change', toggleRepair));
     toggleRepair();
+
+    // Type de formation : champ « Précisez » affiché uniquement si « Autre »
+    const formationSelect = document.getElementById('formation_select');
+    const formationAutreField = document.getElementById('formationAutreField');
+    const formationAutreInput = document.getElementById('formationAutreInput');
+    function toggleFormationAutre() {
+        const autre = formationSelect.value === 'autre';
+        formationAutreField.style.display = autre ? '' : 'none';
+        formationAutreInput.required = autre;
+        if (!autre) formationAutreInput.value = '';
+    }
+    formationSelect.addEventListener('change', toggleFormationAutre);
+    toggleFormationAutre();
 
     const canvas = document.getElementById('signatureCanvas');
     const pad = new SignaturePad(canvas, { backgroundColor: 'rgba(255,255,255,0)', penColor: '#1e293b' });
