@@ -78,6 +78,42 @@
     </div>
 
     <div class="section">
+        <p class="section-head"><i class="ti ti-user-plus"></i> Gestion des intervenants</p>
+
+        <form method="POST" action="{{ url_for('admin_add_intervenant') }}" class="add-row">
+            <input type="text" class="input input-sm" name="prenom" placeholder="Prénom" required style="width:auto; flex:1; min-width:110px;">
+            <input type="text" class="input input-sm" name="nom" placeholder="Nom" required style="width:auto; flex:1; min-width:110px;">
+            <button type="submit" class="btn btn-primary btn-sm"><i class="ti ti-plus"></i> Ajouter</button>
+        </form>
+
+        {% if intervenants %}
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>Prénom</th><th>Nom</th><th class="tr">Actions</th></tr></thead>
+                <tbody>
+                    {% for iv in intervenants %}
+                    <tr>
+                        <td>{{ iv.prenom }}</td>
+                        <td><strong>{{ iv.nom }}</strong></td>
+                        <td class="tr">
+                            <form method="POST" action="{{ url_for('admin_delete_intervenant', intervenant_id=iv.id) }}" style="display:inline;" onsubmit="return confirm('Retirer {{ iv.prenom }} {{ iv.nom }} de la liste ? (l\'historique des interventions est conservé)')">
+                                <button class="btn btn-outline btn-sm" data-c="red" title="Supprimer"><i class="ti ti-trash"></i></button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="ti ti-user-off"></i>
+            Aucun intervenant enregistré.
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="section">
         <p class="section-head"><i class="ti ti-history"></i> Dernières interventions</p>
 
         {% if recent %}

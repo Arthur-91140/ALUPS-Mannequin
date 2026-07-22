@@ -47,6 +47,19 @@ app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=30)
 MANNEQUIN_TYPES = ['Homme', 'Femme', 'Enfant', 'Nourrisson']
 DEFAULT_ADMIN_PASSWORD = 'ALUPSAdmin'
 
+# Intervenants pré-enregistrés : amorçage initial de la table `intervenants`.
+# Format (prénom, nom) — le nom peut comporter plusieurs mots.
+DEFAULT_INTERVENANTS = [
+    ('Arthur', 'PRUVOST RIVIERE'),
+    ('Dina', 'FERNANDES'),
+    ('Jérôme', 'RIVIERE'),
+    ('Florence', 'MALAPLATE'),
+    ('Thomas', 'GASTELLU'),
+    ('Bastien', 'PELLECER'),
+    ('Véronique', 'GENOUILLE MONTAGNAC'),
+    ('Regnault', 'QUENTIN'),
+]
+
 # Statuts possibles d'un mannequin (clé stockée en base -> affichage)
 STATUTS = {
     'operationnel': {'label': 'Opérationnel',        'icon': 'circle-check-filled',  'classe': 'operationnel'},
@@ -102,6 +115,13 @@ def init_db():
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (intervention_id) REFERENCES interventions(id) ON DELETE CASCADE
         );
+        CREATE TABLE IF NOT EXISTS intervenants (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            prenom TEXT NOT NULL,
+            nom TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(prenom, nom)
+        );
     ''')
     # Add column if missing (preserves existing data)
     try:
@@ -152,6 +172,14 @@ def init_db():
         ''')
         conn.execute('PRAGMA foreign_keys = ON')
 
+    # Amorçage de la liste d'intervenants — uniquement si la table est vide,
+    # afin de ne pas réintroduire ceux supprimés ensuite par l'administrateur.
+    if conn.execute('SELECT COUNT(*) FROM intervenants').fetchone()[0] == 0:
+        conn.executemany(
+            'INSERT OR IGNORE INTO intervenants (prenom, nom) VALUES (?, ?)',
+            DEFAULT_INTERVENANTS
+        )
+
     conn.commit()
     conn.close()
 
@@ -163,6 +191,24 @@ def is_admin_setup():
     admin = conn.execute('SELECT id FROM admin LIMIT 1').fetchone()
     conn.close()
     return admin is not None
+
+
+def get_intervenants_ordered():
+    """Intervenants avec les plus actifs en tête : tri par nombre
+    d'interventions décroissant, puis alphabétique. Le décompte sert
+    uniquement au classement et n'est pas renvoyé (aucun indicateur affiché)."""
+    conn = get_db()
+    rows = conn.execute('''
+        SELECT iv.id, iv.prenom, iv.nom
+        FROM intervenants iv
+        LEFT JOIN interventions i
+               ON i.prenom = iv.prenom AND i.nom = iv.nom
+        GROUP BY iv.id, iv.prenom, iv.nom
+        ORDER BY COUNT(i.id) DESC,
+                 iv.nom COLLATE NOCASE, iv.prenom COLLATE NOCASE
+    ''').fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
 
 
 def admin_required(f):
@@ -205,6 +251,7 @@ def formulaire():
     return render_template(
         'form.html',
         mannequins=mannequins,
+        intervenants=get_intervenants_ordered(),
         types=MANNEQUIN_TYPES,
         pre_type=pre_type,
         pre_numero=pre_numero,
@@ -217,8 +264,21 @@ def formulaire():
 def formulaire_submit():
     mannequin_id = request.form.get('mannequin_id')
     date = request.form.get('date')
+    intervenant_id = request.form.get('intervenant_id', '')
     prenom = request.form.get('prenom', '').strip()
     nom = request.form.get('nom', '').strip()
+
+    # Intervenant : soit choisi dans la liste prédéfinie, soit saisi à la main.
+    # Un intervenant sélectionné prime sur les champs texte.
+    if intervenant_id.isdigit():
+        conn = get_db()
+        iv = conn.execute(
+            'SELECT prenom, nom FROM intervenants WHERE id = ?', (intervenant_id,)
+        ).fetchone()
+        conn.close()
+        if iv:
+            prenom, nom = iv['prenom'], iv['nom']
+
     nettoyage = request.form.get('nettoyage')
     changement_poumons = request.form.get('changement_poumons')
     reparation = request.form.get('reparation')
@@ -258,6 +318,7 @@ def formulaire_submit():
         return render_template(
             'form.html',
             mannequins=mannequins,
+            intervenants=get_intervenants_ordered(),
             types=MANNEQUIN_TYPES,
             pre_type=request.form.get('type_select', ''),
             pre_numero=request.form.get('numero_select', ''),
@@ -526,6 +587,7 @@ def admin_dashboard():
     return render_template(
         'admin_dashboard.html',
         mannequins=mannequins,
+        intervenants=get_intervenants_ordered(),
         recent=recent,
         types=MANNEQUIN_TYPES,
         statuts=STATUTS,
@@ -627,6 +689,45 @@ def admin_delete_mannequin(mannequin_id):
     conn.commit()
     conn.close()
     flash('Mannequin supprimé.', 'success')
+    return redirect(url_for('admin_dashboard'))
+
+
+@app.route('/admin/intervenants/add', methods=['POST'])
+@admin_required
+def admin_add_intervenant():
+    prenom = request.form.get('prenom', '').strip()
+    nom = request.form.get('nom', '').strip()
+
+    if not prenom or not nom:
+        flash('Veuillez indiquer le prénom et le nom de l\'intervenant.', 'danger')
+        return redirect(url_for('admin_dashboard'))
+
+    conn = get_db()
+    try:
+        conn.execute(
+            'INSERT INTO intervenants (prenom, nom) VALUES (?, ?)',
+            (prenom, nom)
+        )
+        conn.commit()
+        flash(f'Intervenant {prenom} {nom} ajouté.', 'success')
+    except sqlite3.IntegrityError:
+        flash(f'L\'intervenant {prenom} {nom} existe déjà.', 'danger')
+    finally:
+        conn.close()
+
+    return redirect(url_for('admin_dashboard'))
+
+
+@app.route('/admin/intervenants/<int:intervenant_id>/delete', methods=['POST'])
+@admin_required
+def admin_delete_intervenant(intervenant_id):
+    # Retire l'intervenant de la liste prédéfinie. Les interventions déjà
+    # enregistrées conservent le prénom/nom saisis : l'historique reste intact.
+    conn = get_db()
+    conn.execute('DELETE FROM intervenants WHERE id = ?', (intervenant_id,))
+    conn.commit()
+    conn.close()
+    flash('Intervenant retiré de la liste.', 'success')
     return redirect(url_for('admin_dashboard'))
 
 

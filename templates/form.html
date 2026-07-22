@@ -48,14 +48,30 @@
                     <label class="label">Date <span class="req">*</span></label>
                     <input type="date" class="input" name="date" value="{{ form_data.date if form_data else today }}" required>
                 </div>
-                <div class="fgrid">
+                <div class="field">
+                    <label class="label">Intervenant <span class="req">*</span></label>
+                    <select class="select" id="intervenant_select" name="intervenant_id" required>
+                        <option value="">Sélectionnez</option>
+                        {% for iv in intervenants %}
+                        <option value="{{ iv.id }}"
+                                {% if form_data and form_data.intervenant_id == iv.id|string %}selected{% endif %}>
+                            {{ iv.prenom }} {{ iv.nom }}
+                        </option>
+                        {% endfor %}
+                        <option value="manual"
+                                {% if form_data and form_data.intervenant_id == 'manual' %}selected{% endif %}>
+                            Saisir manuellement…
+                        </option>
+                    </select>
+                </div>
+                <div class="fgrid" id="manualIntervenant" style="display:none;">
                     <div class="field">
                         <label class="label">Prénom <span class="req">*</span></label>
-                        <input type="text" class="input" name="prenom" value="{{ form_data.prenom if form_data else '' }}" required>
+                        <input type="text" class="input" name="prenom" id="prenomInput" value="{{ form_data.prenom if form_data else '' }}">
                     </div>
                     <div class="field">
                         <label class="label">Nom <span class="req">*</span></label>
-                        <input type="text" class="input" name="nom" value="{{ form_data.nom if form_data else '' }}" required>
+                        <input type="text" class="input" name="nom" id="nomInput" value="{{ form_data.nom if form_data else '' }}">
                     </div>
                 </div>
 
@@ -184,6 +200,20 @@ document.addEventListener('DOMContentLoaded', function() {
     typeSelect.addEventListener('change', updateNumeros);
     numeroSelect.addEventListener('change', function() { mannequinIdInput.value = this.options[this.selectedIndex].dataset.id || ''; });
     if (preType) updateNumeros();
+
+    // Intervenant : bascule liste prédéfinie <-> saisie manuelle
+    const intervenantSelect = document.getElementById('intervenant_select');
+    const manualBlock = document.getElementById('manualIntervenant');
+    const prenomInput = document.getElementById('prenomInput');
+    const nomInput = document.getElementById('nomInput');
+    function toggleManual() {
+        const manual = intervenantSelect.value === 'manual';
+        manualBlock.style.display = manual ? '' : 'none';
+        prenomInput.required = manual;
+        nomInput.required = manual;
+    }
+    intervenantSelect.addEventListener('change', toggleManual);
+    toggleManual();
 
     // Show/hide repair description
     const repField = document.getElementById('reparationDescField');
