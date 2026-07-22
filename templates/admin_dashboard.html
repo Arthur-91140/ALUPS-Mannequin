@@ -186,7 +186,7 @@
 
         <div class="admin-cards">
             {% for iv in intervenants %}
-            <div class="data-card">
+            <div class="data-card data-card--intervenant">
                 <div class="data-card-head">
                     <span class="data-card-title"><i class="ti ti-user"></i> {{ iv.prenom }} <strong>{{ iv.nom }}</strong></span>
                     <form method="POST" action="{{ url_for('admin_delete_intervenant', intervenant_id=iv.id) }}" onsubmit="return confirm('Retirer {{ iv.prenom }} {{ iv.nom }} de la liste ? (l\'historique des interventions est conservé)')">

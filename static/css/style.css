@@ -1332,16 +1332,22 @@ tbody tr:last-child td { border-bottom: none; }
     margin-top: 0.75rem;
     padding-top: 0.7rem;
     border-top: 1px solid var(--g100);
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 0.4rem;
 }
 .data-card-actions .btn {
     min-height: 40px;
-    min-width: 40px;
+    width: 100%;
     justify-content: center;
 }
-.data-card-actions form { display: inline-flex; }
+/* Action destructive (Supprimer) : pleine largeur, détachée en bas */
+.data-card-actions form { grid-column: 1 / -1; }
+
+/* Carte intervenant : bouton Retirer aligné à droite, y compris s'il passe
+   à la ligne quand le nom est trop long */
+.data-card--intervenant .data-card-head { gap: 0.4rem 0.6rem; }
+.data-card--intervenant form { margin-left: auto; }
 
 /* ── Grid ──────────────────────────────────────────── */
 
