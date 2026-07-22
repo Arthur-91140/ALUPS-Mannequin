@@ -907,12 +907,16 @@ tbody tr:last-child td { border-bottom: none; }
 
 .etat-card-foot {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: flex-start;
     gap: 0.5rem;
     margin-top: auto;
     padding-top: 0.7rem;
     flex-wrap: wrap;
+}
+
+.etat-card-foot .btn {
+    margin-left: auto;
 }
 
 .etat-updated {
