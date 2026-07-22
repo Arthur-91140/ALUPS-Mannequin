@@ -50,9 +50,9 @@ DEFAULT_ADMIN_PASSWORD = 'ALUPSAdmin'
 # Intervenants pré-enregistrés : amorçage initial de la table `intervenants`.
 # Format (prénom, nom) — le nom peut comporter plusieurs mots.
 DEFAULT_INTERVENANTS = [
-    ('Arthur', 'PRUVOST RIVIERE'),
+    ('Arthur', 'PRUVOST RIVIÈRE'),
     ('Dina', 'FERNANDES'),
-    ('Jérôme', 'RIVIERE'),
+    ('Jérôme', 'RIVIÈRE'),
     ('Florence', 'MALAPLATE'),
     ('Thomas', 'GASTELLU'),
     ('Bastien', 'PELLECER'),
@@ -179,6 +179,14 @@ def init_db():
             'INSERT OR IGNORE INTO intervenants (prenom, nom) VALUES (?, ?)',
             DEFAULT_INTERVENANTS
         )
+
+    # Correction du nom « RIVIERE » -> « RIVIÈRE » sur les tables déjà amorcées
+    # (idempotent : sans effet si le nom est déjà correct ou absent).
+    for old, new in (('RIVIERE', 'RIVIÈRE'), ('PRUVOST RIVIERE', 'PRUVOST RIVIÈRE')):
+        try:
+            conn.execute('UPDATE intervenants SET nom = ? WHERE nom = ?', (new, old))
+        except sqlite3.IntegrityError:
+            pass  # un intervenant « RIVIÈRE » existe déjà, on laisse tel quel
 
     conn.commit()
     conn.close()
