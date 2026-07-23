@@ -445,10 +445,9 @@ tbody tr:last-child td { border-bottom: none; }
 .question + .question { border-top: 1px solid var(--g100); }
 
 /* Poumons changés le X · N formations — insérée entre la question
-   « Changement des poumons ? » et la suivante, elle porte elle-même la
-   bordure de séparation (la question suivante n'est alors plus adjacente
-   à un .question et ne reçoit donc plus la bordure via la règle ci-dessus). */
-.question-poumons { border-bottom: 1px solid var(--g100); }
+   « Changement des poumons ? » et la suivante ; la bordure de séparation
+   passe donc sous l'encart plutôt qu'entre lui et la question précédente. */
+.poumons-note + .question { border-top: 1px solid var(--g100); }
 
 .poumons-note {
     margin: 0.75rem 0;
