@@ -444,6 +444,28 @@ tbody tr:last-child td { border-bottom: none; }
 
 .question + .question { border-top: 1px solid var(--g100); }
 
+/* Poumons changés le X · N formations — insérée entre la question
+   « Changement des poumons ? » et la suivante, elle porte elle-même la
+   bordure de séparation (la question suivante n'est alors plus adjacente
+   à un .question et ne reçoit donc plus la bordure via la règle ci-dessus). */
+.question-poumons { border-bottom: 1px solid var(--g100); }
+
+.poumons-note {
+    margin: 0.75rem 0;
+    padding: 0.65rem 0.85rem;
+    background: var(--g50);
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--g300);
+}
+
+.poumons-note-text {
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--g700);
+}
+
+.poumons-note-text i { color: var(--g400); margin-right: 0.2rem; }
+
 .question-text {
     font-size: 0.88rem;
     font-weight: 500;

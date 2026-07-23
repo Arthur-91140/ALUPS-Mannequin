@@ -41,10 +41,6 @@
                     </div>
                 </div>
 
-                <div class="etat-detail" id="poumonsInfo" style="display:none;">
-                    <p class="etat-detail-text"><i class="ti ti-lungs"></i> <span id="poumonsDate"></span><br><span id="poumonsNb"></span></p>
-                </div>
-
                 <div class="field">
                     <label class="label">Type de formation <span class="req">*</span></label>
                     <select class="select" id="formation_select" name="type_formation" required>
@@ -111,7 +107,7 @@
                     </div>
                 </div>
 
-                <div class="question">
+                <div class="question question-poumons">
                     <span class="question-text">Changement des poumons ? <span class="req">*</span></span>
                     <div class="toggle">
                         <input type="radio" name="changement_poumons" id="poumons_oui" value="oui"
@@ -121,6 +117,10 @@
                                {% if form_data and form_data.changement_poumons == 'non' %}checked{% endif %}>
                         <label class="t-non" for="poumons_non">Non</label>
                     </div>
+                </div>
+
+                <div class="poumons-note" id="poumonsInfo" style="display:none;">
+                    <p class="poumons-note-text"><i class="ti ti-lungs"></i> <span id="poumonsDate"></span><br><span id="poumonsNb"></span></p>
                 </div>
 
                 <div class="question">
