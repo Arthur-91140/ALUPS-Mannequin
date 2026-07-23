@@ -58,15 +58,17 @@
                 {% endif %}
 
                 <div class="etat-card-foot">
-                    <span class="etat-updated">
+                    <span class="etat-updated etat-updated-multiline">
                         <i class="ti ti-lungs"></i>
+                        <span>
                         {% if m.poumons_derniere_date %}
                         {% set pd = m.poumons_derniere_date.split('-') %}
                         Poumons changés le {{ pd[2] }}/{{ pd[1] }}/{{ pd[0] }}
                         {% else %}
                         Poumons jamais changés
                         {% endif %}
-                        &middot; {{ m.poumons_nb_formations }} formation{{ 's' if m.poumons_nb_formations != 1 else '' }} avec ces poumons
+                        <br>{{ m.poumons_nb_formations }} formation{{ 's' if m.poumons_nb_formations != 1 else '' }} avec ces poumons
+                        </span>
                     </span>
                     {% if m.statut_updated_at %}
                     {% set d = m.statut_updated_at[:10].split('-') %}

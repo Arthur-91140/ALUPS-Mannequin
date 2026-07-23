@@ -926,6 +926,15 @@ tbody tr:last-child td { border-bottom: none; }
     gap: 0.3rem;
 }
 
+.etat-updated-multiline {
+    align-items: flex-start;
+    line-height: 1.5;
+}
+
+.etat-updated-multiline i {
+    margin-top: 0.15rem;
+}
+
 @media (max-width: 600px) {
     .etat-wrap { padding: 1.25rem 0.9rem 2.5rem; }
     .etat-header h1 { font-size: 1.25rem; }
