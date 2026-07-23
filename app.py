@@ -235,6 +235,35 @@ def is_admin_setup():
     return admin is not None
 
 
+def get_poumons_stats(conn):
+    """Pour chaque mannequin : date du dernier changement des poumons et
+    nombre de formations effectuées avec ces poumons (depuis ce changement
+    inclus ; toutes les formations si les poumons n'ont jamais été changés)."""
+    rows = conn.execute(
+        '''SELECT mannequin_id, date, changement_poumons FROM interventions
+           ORDER BY mannequin_id, date, id'''
+    ).fetchall()
+
+    par_mannequin = {}
+    for r in rows:
+        par_mannequin.setdefault(r['mannequin_id'], []).append(r)
+
+    stats = {}
+    for mannequin_id, interventions in par_mannequin.items():
+        dernier_changement_idx = None
+        for i, inter in enumerate(interventions):
+            if inter['changement_poumons']:
+                dernier_changement_idx = i
+        if dernier_changement_idx is None:
+            stats[mannequin_id] = {'date': None, 'nb_formations': len(interventions)}
+        else:
+            stats[mannequin_id] = {
+                'date': interventions[dernier_changement_idx]['date'],
+                'nb_formations': len(interventions) - dernier_changement_idx
+            }
+    return stats
+
+
 def get_intervenants_ordered():
     """Intervenants avec les plus actifs en tête : tri par nombre
     d'interventions décroissant, puis alphabétique. Le décompte sert
@@ -275,8 +304,13 @@ def formulaire():
     rows = conn.execute(
         'SELECT * FROM mannequins ORDER BY type, numero'
     ).fetchall()
+    poumons_stats = get_poumons_stats(conn)
     conn.close()
     mannequins = [dict(r) for r in rows]
+    for m in mannequins:
+        stat = poumons_stats.get(m['id'], {'date': None, 'nb_formations': 0})
+        m['poumons_derniere_date'] = stat['date']
+        m['poumons_nb_formations'] = stat['nb_formations']
 
     # URL params for direct link
     pre_type = request.args.get('type', '')
@@ -362,7 +396,12 @@ def formulaire_submit():
         mannequins = [dict(r) for r in conn.execute(
             'SELECT * FROM mannequins ORDER BY type, numero'
         ).fetchall()]
+        poumons_stats = get_poumons_stats(conn)
         conn.close()
+        for m in mannequins:
+            stat = poumons_stats.get(m['id'], {'date': None, 'nb_formations': 0})
+            m['poumons_derniere_date'] = stat['date']
+            m['poumons_nb_formations'] = stat['nb_formations']
         for e in errors:
             flash(e, 'danger')
         return render_template(
@@ -442,12 +481,16 @@ def etat():
     rows = conn.execute(
         'SELECT * FROM mannequins ORDER BY type, numero'
     ).fetchall()
+    poumons_stats = get_poumons_stats(conn)
     conn.close()
 
     # Regroupement par type, en conservant l'ordre de MANNEQUIN_TYPES
     mannequins_par_type = {t: [] for t in MANNEQUIN_TYPES}
     for r in rows:
         m = dict(r)
+        stat = poumons_stats.get(m['id'], {'date': None, 'nb_formations': 0})
+        m['poumons_derniere_date'] = stat['date']
+        m['poumons_nb_formations'] = stat['nb_formations']
         if m['type'] in mannequins_par_type:
             mannequins_par_type[m['type']].append(m)
 

@@ -41,6 +41,10 @@
                     </div>
                 </div>
 
+                <div class="etat-detail" id="poumonsInfo" style="display:none;">
+                    <p class="etat-detail-text"><i class="ti ti-lungs"></i> <span id="poumonsDate"></span> &middot; <span id="poumonsNb"></span></p>
+                </div>
+
                 <div class="field">
                     <label class="label">Type de formation <span class="req">*</span></label>
                     <select class="select" id="formation_select" name="type_formation" required>
@@ -195,11 +199,28 @@ document.addEventListener('DOMContentLoaded', function() {
     const preNumero = "{{ pre_numero }}";
     const preMannequinId = "{{ pre_mannequin_id or '' }}";
 
+    const poumonsInfo = document.getElementById('poumonsInfo');
+    const poumonsDate = document.getElementById('poumonsDate');
+    const poumonsNb = document.getElementById('poumonsNb');
+    function updatePoumonsInfo() {
+        const m = mannequins.find(m => m.id == mannequinIdInput.value);
+        if (!m) { poumonsInfo.style.display = 'none'; return; }
+        if (m.poumons_derniere_date) {
+            const [y, mo, d] = m.poumons_derniere_date.split('-');
+            poumonsDate.textContent = 'Poumons changés le ' + d + '/' + mo + '/' + y;
+        } else {
+            poumonsDate.textContent = 'Poumons jamais changés';
+        }
+        const nb = m.poumons_nb_formations || 0;
+        poumonsNb.textContent = nb + ' formation' + (nb !== 1 ? 's' : '') + ' avec ces poumons';
+        poumonsInfo.style.display = '';
+    }
+
     function updateNumeros() {
         const t = typeSelect.value;
         numeroSelect.innerHTML = '<option value="">Sélectionnez</option>';
         mannequinIdInput.value = '';
-        if (!t) { numeroSelect.innerHTML = '<option value="">Type d\'abord</option>'; return; }
+        if (!t) { numeroSelect.innerHTML = '<option value="">Type d\'abord</option>'; updatePoumonsInfo(); return; }
         const list = mannequins.filter(m => m.type === t).sort((a, b) => {
             const na = parseInt(a.numero), nb = parseInt(b.numero);
             return (!isNaN(na) && !isNaN(nb)) ? na - nb : a.numero.localeCompare(b.numero);
@@ -211,10 +232,14 @@ document.addEventListener('DOMContentLoaded', function() {
             numeroSelect.appendChild(o);
         });
         if (!list.length) numeroSelect.innerHTML = '<option value="">Aucun mannequin</option>';
+        updatePoumonsInfo();
     }
 
     typeSelect.addEventListener('change', updateNumeros);
-    numeroSelect.addEventListener('change', function() { mannequinIdInput.value = this.options[this.selectedIndex].dataset.id || ''; });
+    numeroSelect.addEventListener('change', function() {
+        mannequinIdInput.value = this.options[this.selectedIndex].dataset.id || '';
+        updatePoumonsInfo();
+    });
     if (preType) updateNumeros();
 
     // Intervenant : bascule liste prédéfinie <-> saisie manuelle
