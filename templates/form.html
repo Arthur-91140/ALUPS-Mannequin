@@ -63,11 +63,17 @@
                 <div class="fgrid">
                     <div class="field">
                         <label class="label">Date de saisie <span class="req">*</span></label>
-                        <input type="date" class="input" name="date" value="{{ form_data.date if form_data else today }}" required>
+                        <div class="date-fr">
+                            <input type="date" class="input" name="date" value="{{ form_data.date if form_data else today }}" required>
+                            <span class="date-fr-text" aria-hidden="true"></span>
+                        </div>
                     </div>
                     <div class="field">
                         <label class="label">Date de la formation <span class="req">*</span></label>
-                        <input type="date" class="input" name="date_formation" value="{{ form_data.date_formation if form_data else today }}" required>
+                        <div class="date-fr">
+                            <input type="date" class="input" name="date_formation" value="{{ form_data.date_formation if form_data else today }}" required>
+                            <span class="date-fr-text" aria-hidden="true"></span>
+                        </div>
                     </div>
                 </div>
                 <div class="field">
@@ -271,6 +277,26 @@ document.addEventListener('DOMContentLoaded', function() {
         updatePoumonsInfo();
     });
     if (preType) updateNumeros();
+
+    // Dates affichées en JJ/MM/AAAA quelle que soit la langue du navigateur
+    document.querySelectorAll('.date-fr').forEach(wrap => {
+        const input = wrap.querySelector('input');
+        const text = wrap.querySelector('.date-fr-text');
+        function refresh() {
+            const [y, mo, d] = input.value.split('-');
+            text.textContent = input.value ? d + '/' + mo + '/' + y : 'JJ/MM/AAAA';
+            wrap.classList.toggle('is-empty', !input.value);
+        }
+        input.addEventListener('input', refresh);
+        input.addEventListener('change', refresh);
+        // Souris : ouvrir le calendrier au clic (le tactile l'ouvre déjà)
+        input.addEventListener('click', () => {
+            if (matchMedia('(pointer: fine)').matches && input.showPicker) {
+                try { input.showPicker(); } catch (e) {}
+            }
+        });
+        refresh();
+    });
 
     // Intervenant : bascule liste prédéfinie <-> saisie manuelle
     const intervenantSelect = document.getElementById('intervenant_select');

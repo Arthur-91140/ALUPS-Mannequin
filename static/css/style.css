@@ -231,6 +231,25 @@ img { max-width: 100%; display: block; }
 .req { color: var(--red); font-weight: 700; }
 .field { margin-bottom: 0.9rem; }
 
+/* Champ date affiché en JJ/MM/AAAA quelle que soit la langue du navigateur :
+   le texte natif est masqué et remplacé par un libellé superposé, le
+   calendrier natif reste utilisé pour choisir la date. */
+.date-fr { position: relative; }
+.date-fr .input { color: transparent; }
+.date-fr .input::-webkit-datetime-edit { opacity: 0; }
+
+.date-fr-text {
+    position: absolute;
+    left: calc(0.8rem + 1.5px);
+    top: 50%;
+    transform: translateY(-50%);
+    font: 400 0.9rem 'Inter', sans-serif;
+    color: var(--g800);
+    pointer-events: none;
+}
+
+.date-fr.is-empty .date-fr-text { color: var(--g400); }
+
 /* ── Alerts ────────────────────────────────────────── */
 
 .alert {
