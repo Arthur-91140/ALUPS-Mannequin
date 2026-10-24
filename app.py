@@ -517,6 +517,14 @@ def formulaire_submit():
     )
     intervention_id = cursor.lastrowid
 
+    # Le statut du mannequin (page État, admin) suit l'état saisi
+    conn.execute(
+        '''UPDATE mannequins
+           SET statut = ?, statut_detail = ?, statut_updated_at = CURRENT_TIMESTAMP
+           WHERE id = ?''',
+        (etat, etat_detail if etat != 'operationnel' else '', mannequin_id)
+    )
+
     # Save photos
     photos = request.files.getlist('photos')
     for photo in photos:
