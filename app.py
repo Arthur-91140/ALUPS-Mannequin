@@ -360,6 +360,7 @@ def formulaire():
 def formulaire_submit():
     mannequin_id = request.form.get('mannequin_id')
     date = request.form.get('date')
+    date_formation = request.form.get('date_formation')
     intervenant_id = request.form.get('intervenant_id', '')
     prenom = request.form.get('prenom', '').strip()
     nom = request.form.get('nom', '').strip()
@@ -391,7 +392,9 @@ def formulaire_submit():
     if not mannequin_id:
         errors.append('Veuillez sélectionner un mannequin.')
     if not date:
-        errors.append('Veuillez indiquer la date.')
+        errors.append('Veuillez indiquer la date de saisie.')
+    if not date_formation:
+        errors.append('Veuillez indiquer la date de la formation.')
     if not prenom:
         errors.append('Veuillez indiquer votre prénom.')
     if not nom:
@@ -457,12 +460,12 @@ def formulaire_submit():
     conn = get_db()
     cursor = conn.execute(
         '''INSERT INTO interventions
-           (mannequin_id, date, prenom, nom, type_formation, type_formation_autre,
+           (mannequin_id, date, date_formation, prenom, nom, type_formation, type_formation_autre,
             nettoyage, changement_poumons, visage_change, visage_nettoye,
             reparation, description_reparation, informations, signature_path)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
         (
-            mannequin_id, date, prenom, nom,
+            mannequin_id, date, date_formation, prenom, nom,
             type_formation,
             type_formation_autre if type_formation == 'autre' else '',
             1 if nettoyage == 'oui' else 0,

@@ -60,9 +60,15 @@
                 <div class="fdiv"></div>
 
                 <p class="fsec"><i class="ti ti-user"></i> Intervenant</p>
-                <div class="field">
-                    <label class="label">Date <span class="req">*</span></label>
-                    <input type="date" class="input" name="date" value="{{ form_data.date if form_data else today }}" required>
+                <div class="fgrid">
+                    <div class="field">
+                        <label class="label">Date de saisie <span class="req">*</span></label>
+                        <input type="date" class="input" name="date" value="{{ form_data.date if form_data else today }}" required>
+                    </div>
+                    <div class="field">
+                        <label class="label">Date de la formation <span class="req">*</span></label>
+                        <input type="date" class="input" name="date_formation" value="{{ form_data.date_formation if form_data else today }}" required>
+                    </div>
                 </div>
                 <div class="field">
                     <label class="label">Intervenant <span class="req">*</span></label>
