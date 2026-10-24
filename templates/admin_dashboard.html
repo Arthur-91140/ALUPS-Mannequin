@@ -120,7 +120,7 @@
                 <tbody>
                     {% for i in recent %}
                     <tr>
-                        <td>{{ i.date }}</td>
+                        <td>{{ i.date|date_fr }}</td>
                         <td><span class="badge badge-{{ i.m_type|lower }}">{{ i.m_type }}</span> N°{{ i.m_numero }}</td>
                         <td>{{ i.prenom }} {{ i.nom }}</td>
                         <td class="tc">{% if i.nettoyage %}<i class="ti ti-circle-check st-yes"></i>{% else %}<i class="ti ti-circle-x st-no"></i>{% endif %}</td>
@@ -139,7 +139,7 @@
             <div class="data-card">
                 <div class="data-card-head">
                     <span class="data-card-title"><span class="badge badge-{{ i.m_type|lower }}">{{ i.m_type }}</span> <strong>N°{{ i.m_numero }}</strong></span>
-                    <span class="data-card-date">{{ i.date }}</span>
+                    <span class="data-card-date">{{ i.date|date_fr }}</span>
                 </div>
                 <div class="data-card-meta"><i class="ti ti-user"></i> {{ i.prenom }} {{ i.nom }}</div>
                 <div class="data-card-chips">
