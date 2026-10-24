@@ -540,6 +540,45 @@ tbody tr:last-child td { border-bottom: none; }
     box-shadow: 0 2px 8px rgba(16,185,129,0.35);
 }
 
+/* Question à plusieurs choix : intitulé au-dessus, choix sur toute la largeur */
+.question-col {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+}
+
+/* État du mannequin : vert / orange / rouge */
+.toggle-etat {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.toggle-etat label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 0.6rem;
+    line-height: 1.3;
+}
+
+.toggle input:checked + .t-operationnel {
+    background: var(--green);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(16,185,129,0.35);
+}
+
+.toggle input:checked + .t-defaut {
+    background: var(--orange);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(245,158,11,0.35);
+}
+
+.toggle input:checked + .t-hors_service {
+    background: var(--red);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(200,16,46,0.3);
+}
+
 /* ── Signature ─────────────────────────────────────── */
 
 .sig-box {

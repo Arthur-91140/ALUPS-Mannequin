@@ -100,6 +100,7 @@ def formation_label(row):
 
 # Rendre le libellé de formation disponible dans les templates
 app.jinja_env.globals['formation_label'] = formation_label
+app.jinja_env.globals['etats'] = ETATS
 
 
 def date_fr(value):
@@ -415,8 +416,9 @@ def formulaire_submit():
     changement_poumons = request.form.get('changement_poumons')
     visage_change = request.form.get('visage_change')
     visage_nettoye = request.form.get('visage_nettoye')
+    etat = request.form.get('etat', '')
     reparation = request.form.get('reparation')
-    description_reparation = request.form.get('description_reparation', '').strip()
+    etat_detail = request.form.get('etat_detail', '').strip()
     informations = request.form.get('informations', '').strip()
     signature_data = request.form.get('signature', '')
 
@@ -444,10 +446,12 @@ def formulaire_submit():
         errors.append('Veuillez indiquer si le visage a été changé.')
     if visage_nettoye not in ('oui', 'non'):
         errors.append('Veuillez indiquer si le visage a été nettoyé.')
-    if reparation not in ('oui', 'non'):
+    if etat not in ETATS:
+        errors.append("Veuillez indiquer l'état du mannequin.")
+    if etat == 'defaut' and reparation not in ('oui', 'non'):
         errors.append('Veuillez indiquer si une réparation a été effectuée.')
-    if reparation == 'oui' and not description_reparation:
-        errors.append('Veuillez décrire la réparation effectuée.')
+    if etat in ('defaut', 'hors_service') and not etat_detail:
+        errors.append("Veuillez détailler l'état du mannequin.")
     if not signature_data:
         errors.append('Veuillez signer le formulaire.')
 
@@ -495,8 +499,8 @@ def formulaire_submit():
         '''INSERT INTO interventions
            (mannequin_id, date, date_formation, prenom, nom, type_formation, type_formation_autre,
             nettoyage, changement_poumons, visage_change, visage_nettoye,
-            reparation, description_reparation, informations, signature_path)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+            etat, etat_detail, reparation, informations, signature_path)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
         (
             mannequin_id, date, date_formation, prenom, nom,
             type_formation,
@@ -505,8 +509,9 @@ def formulaire_submit():
             1 if changement_poumons == 'oui' else 0,
             1 if visage_change == 'oui' else 0,
             1 if visage_nettoye == 'oui' else 0,
-            1 if reparation == 'oui' else 0,
-            description_reparation if reparation == 'oui' else '',
+            etat,
+            etat_detail if etat != 'operationnel' else '',
+            1 if etat == 'defaut' and reparation == 'oui' else 0,
             informations, signature_path
         )
     )
