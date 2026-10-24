@@ -1,12 +1,12 @@
 {% extends "base_admin.html" %}
 {% from "_etat.html" import etat_tag %}
-{% block title %}Intervention du {{ inter.date|date_fr }} — {{ inter.m_type }} N°{{ inter.m_numero }}{% endblock %}
+{% block title %}Intervention du {{ inter.date|date_fr }} - {{ inter.m_type }} N°{{ inter.m_numero }}{% endblock %}
 
 {% block content %}
 <div class="admin-bar">
     <div style="display:flex; align-items:center; gap:0.75rem;">
         <a href="{{ url_for('admin_history', mannequin_id=inter.m_id) }}" class="btn btn-outline btn-sm"><i class="ti ti-arrow-left"></i></a>
-        <h1><span class="badge badge-{{ inter.m_type|lower }}">{{ inter.m_type }}</span> N°{{ inter.m_numero }} — {{ inter.date|date_fr }}</h1>
+        <h1><span class="badge badge-{{ inter.m_type|lower }}">{{ inter.m_type }}</span> N°{{ inter.m_numero }} - {{ inter.date|date_fr }}</h1>
     </div>
     <form method="POST" action="{{ url_for('admin_delete_intervention', intervention_id=inter.id) }}" onsubmit="return confirm('Supprimer cette intervention ?')">
         <button class="btn btn-outline btn-sm" data-c="red"><i class="ti ti-trash"></i> Supprimer</button>
