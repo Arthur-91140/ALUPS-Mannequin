@@ -1,0 +1,7 @@
+{# Pastille colorée de l'état du mannequin saisi dans une intervention
+   (clé de ETATS). court=true pour les tableaux et cartes compactes. #}
+{% macro etat_tag(etat, court=false) -%}
+{% set icones = {'operationnel': 'circle-check', 'defaut': 'alert-triangle', 'hors_service': 'circle-x'} %}
+{% set courts = {'operationnel': 'Opérationnel', 'defaut': 'Défaut', 'hors_service': 'Hors service'} %}
+<span class="detail-tag tag-etat-{{ etat }}"><i class="ti ti-{{ icones[etat] }}"></i> {{ courts[etat] if court else etats[etat] }}</span>
+{%- endmacro %}

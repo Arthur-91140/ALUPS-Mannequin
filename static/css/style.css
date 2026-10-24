@@ -775,6 +775,11 @@ tbody tr:last-child td { border-bottom: none; }
 .tag-gray  { background: var(--g100); color: var(--g400); }
 .tag-red   { background: var(--red-50); color: var(--red); }
 
+/* État du mannequin saisi dans une intervention */
+.tag-etat-operationnel { background: var(--green-50); color: #047857; }
+.tag-etat-defaut       { background: #fff7ed; color: #b45309; }
+.tag-etat-hors_service { background: var(--red-50); color: var(--red); }
+
 .detail-text {
     font-size: 0.92rem;
     line-height: 1.7;
