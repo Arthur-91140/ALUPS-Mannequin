@@ -54,6 +54,18 @@
                 <span class="detail-tag tag-gray"><i class="ti ti-circle-x"></i> Non</span>
                 {% endif %}
             </div>
+            {% for champ, libelle in (('visage_change', 'Visage changé'), ('visage_nettoye', 'Visage nettoyé')) %}
+            <div class="detail-check">
+                <span>{{ libelle }}</span>
+                {% if inter[champ] is none %}
+                <span class="detail-tag tag-gray">Non renseigné</span>
+                {% elif inter[champ] %}
+                <span class="detail-tag tag-green"><i class="ti ti-circle-check"></i> Oui</span>
+                {% else %}
+                <span class="detail-tag tag-gray"><i class="ti ti-circle-x"></i> Non</span>
+                {% endif %}
+            </div>
+            {% endfor %}
             <div class="detail-check">
                 <span>Réparation</span>
                 {% if inter.reparation %}
