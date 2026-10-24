@@ -163,6 +163,17 @@ def init_db():
         except sqlite3.OperationalError:
             pass  # Column already exists
 
+    # Visage changé / nettoyé (migration additive ; NULL pour les
+    # interventions saisies avant l'ajout de ces questions)
+    for ddl in (
+        "ALTER TABLE interventions ADD COLUMN visage_change INTEGER",
+        "ALTER TABLE interventions ADD COLUMN visage_nettoye INTEGER",
+    ):
+        try:
+            conn.execute(ddl)
+        except sqlite3.OperationalError:
+            pass  # Column already exists
+
     # Statut des mannequins (migration additive, préserve l'existant)
     for ddl in (
         "ALTER TABLE mannequins ADD COLUMN statut TEXT DEFAULT 'operationnel'",
