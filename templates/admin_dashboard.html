@@ -126,10 +126,10 @@
                         <td>{{ i.prenom }} {{ i.nom }}</td>
                         <td class="tc">{% if i.nettoyage %}<i class="ti ti-circle-check st-yes"></i>{% else %}<i class="ti ti-circle-x st-no"></i>{% endif %}</td>
                         <td class="tc">{% if i.changement_poumons %}<i class="ti ti-circle-check st-yes"></i>{% else %}<i class="ti ti-circle-x st-no"></i>{% endif %}</td>
-                        <td class="tc">{% if i.visage_change is none %}<span class="st-no">—</span>{% elif i.visage_change %}<i class="ti ti-circle-check st-yes"></i>{% else %}<i class="ti ti-circle-x st-no"></i>{% endif %}</td>
-                        <td class="tc">{% if i.visage_nettoye is none %}<span class="st-no">—</span>{% elif i.visage_nettoye %}<i class="ti ti-circle-check st-yes"></i>{% else %}<i class="ti ti-circle-x st-no"></i>{% endif %}</td>
-                        <td class="tc">{% if i.etat %}{{ etat_tag(i.etat, court=true) }}{% else %}<span class="st-no">—</span>{% endif %}</td>
-                        <td class="tc">{% if i.etat is none or i.etat == 'defaut' %}{% if i.reparation %}<i class="ti ti-circle-x st-warn"></i>{% else %}<i class="ti ti-circle-check st-ok"></i>{% endif %}{% else %}<span class="st-no">—</span>{% endif %}</td>
+                        <td class="tc">{% if i.visage_change is none %}<span class="st-no">-</span>{% elif i.visage_change %}<i class="ti ti-circle-check st-yes"></i>{% else %}<i class="ti ti-circle-x st-no"></i>{% endif %}</td>
+                        <td class="tc">{% if i.visage_nettoye is none %}<span class="st-no">-</span>{% elif i.visage_nettoye %}<i class="ti ti-circle-check st-yes"></i>{% else %}<i class="ti ti-circle-x st-no"></i>{% endif %}</td>
+                        <td class="tc">{% if i.etat %}{{ etat_tag(i.etat, court=true) }}{% else %}<span class="st-no">-</span>{% endif %}</td>
+                        <td class="tc">{% if i.etat is none or i.etat == 'defaut' %}{% if i.reparation %}<i class="ti ti-circle-x st-warn"></i>{% else %}<i class="ti ti-circle-check st-ok"></i>{% endif %}{% else %}<span class="st-no">-</span>{% endif %}</td>
                     </tr>
                     {% endfor %}
                 </tbody>

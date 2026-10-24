@@ -27,19 +27,19 @@
                 {% for i in interventions %}
                 <tr class="row-link" onclick="window.location='{{ url_for('admin_intervention_detail', intervention_id=i.id) }}'">
                     <td>{{ i.date|date_fr }}</td>
-                    <td>{% if i.date_formation %}{{ i.date_formation|date_fr }}{% else %}<span class="st-no">—</span>{% endif %}</td>
+                    <td>{% if i.date_formation %}{{ i.date_formation|date_fr }}{% else %}<span class="st-no">-</span>{% endif %}</td>
                     <td>{{ i.prenom }}</td>
                     <td>{{ i.nom }}</td>
                     <td>{{ formation_label(i) }}</td>
                     <td class="tc">{% if i.nettoyage %}<i class="ti ti-circle-check st-yes"></i>{% else %}<i class="ti ti-circle-x st-no"></i>{% endif %}</td>
                     <td class="tc">{% if i.changement_poumons %}<i class="ti ti-circle-check st-yes"></i>{% else %}<i class="ti ti-circle-x st-no"></i>{% endif %}</td>
-                    <td class="tc">{% if i.visage_change is none %}<span class="st-no">—</span>{% elif i.visage_change %}<i class="ti ti-circle-check st-yes"></i>{% else %}<i class="ti ti-circle-x st-no"></i>{% endif %}</td>
-                    <td class="tc">{% if i.visage_nettoye is none %}<span class="st-no">—</span>{% elif i.visage_nettoye %}<i class="ti ti-circle-check st-yes"></i>{% else %}<i class="ti ti-circle-x st-no"></i>{% endif %}</td>
-                    <td class="tc">{% if i.etat %}{{ etat_tag(i.etat, court=true) }}{% else %}<span class="st-no">—</span>{% endif %}</td>
-                    <td class="tc">{% if i.etat is none or i.etat == 'defaut' %}{% if i.reparation %}<i class="ti ti-alert-triangle st-warn"></i>{% else %}<i class="ti ti-circle-check st-ok"></i>{% endif %}{% else %}<span class="st-no">—</span>{% endif %}</td>
+                    <td class="tc">{% if i.visage_change is none %}<span class="st-no">-</span>{% elif i.visage_change %}<i class="ti ti-circle-check st-yes"></i>{% else %}<i class="ti ti-circle-x st-no"></i>{% endif %}</td>
+                    <td class="tc">{% if i.visage_nettoye is none %}<span class="st-no">-</span>{% elif i.visage_nettoye %}<i class="ti ti-circle-check st-yes"></i>{% else %}<i class="ti ti-circle-x st-no"></i>{% endif %}</td>
+                    <td class="tc">{% if i.etat %}{{ etat_tag(i.etat, court=true) }}{% else %}<span class="st-no">-</span>{% endif %}</td>
+                    <td class="tc">{% if i.etat is none or i.etat == 'defaut' %}{% if i.reparation %}<i class="ti ti-alert-triangle st-warn"></i>{% else %}<i class="ti ti-circle-check st-ok"></i>{% endif %}{% else %}<span class="st-no">-</span>{% endif %}</td>
                     <td class="tc">
                         {% set nb = photos_by_intervention.get(i.id, [])|length %}
-                        {% if nb %}<span class="pill"><i class="ti ti-camera" style="font-size:0.85em"></i> {{ nb }}</span>{% else %}<span class="st-no">—</span>{% endif %}
+                        {% if nb %}<span class="pill"><i class="ti ti-camera" style="font-size:0.85em"></i> {{ nb }}</span>{% else %}<span class="st-no">-</span>{% endif %}
                     </td>
                     <td onclick="event.stopPropagation()"><div class="actions"><form method="POST" action="{{ url_for('admin_delete_intervention', intervention_id=i.id) }}" style="display:inline;" onsubmit="return confirm('Supprimer cette intervention ?')"><button class="btn btn-outline btn-sm" data-c="red"><i class="ti ti-trash"></i></button></form></div></td>
                 </tr>
