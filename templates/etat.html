@@ -62,8 +62,7 @@
                         <i class="ti ti-lungs"></i>
                         <span>
                         {% if m.poumons_derniere_date %}
-                        {% set pd = m.poumons_derniere_date.split('-') %}
-                        Poumons changés le {{ pd[2] }}/{{ pd[1] }}/{{ pd[0] }}
+                        Poumons changés le {{ m.poumons_derniere_date|date_fr }}
                         {% else %}
                         Poumons jamais changés
                         {% endif %}
@@ -71,8 +70,7 @@
                         </span>
                     </span>
                     {% if m.statut_updated_at %}
-                    {% set d = m.statut_updated_at[:10].split('-') %}
-                    <span class="etat-updated"><i class="ti ti-clock"></i> Statut mis à jour le {{ d[2] }}/{{ d[1] }}/{{ d[0] }}</span>
+                    <span class="etat-updated"><i class="ti ti-clock"></i> Statut mis à jour le {{ m.statut_updated_at|date_fr }}</span>
                     {% endif %}
                     <a href="{{ url_for('formulaire', type=m.type, numero=m.numero) }}" class="btn btn-outline btn-sm" data-c="blue">
                         <i class="ti ti-clipboard-plus"></i> Faire un suivi
