@@ -372,6 +372,8 @@ def formulaire_submit():
     type_formation_autre = request.form.get('type_formation_autre', '').strip()
     nettoyage = request.form.get('nettoyage')
     changement_poumons = request.form.get('changement_poumons')
+    visage_change = request.form.get('visage_change')
+    visage_nettoye = request.form.get('visage_nettoye')
     reparation = request.form.get('reparation')
     description_reparation = request.form.get('description_reparation', '').strip()
     informations = request.form.get('informations', '').strip()
@@ -395,6 +397,10 @@ def formulaire_submit():
         errors.append('Veuillez indiquer si un nettoyage a été effectué.')
     if changement_poumons not in ('oui', 'non'):
         errors.append('Veuillez indiquer si un changement des poumons a été effectué.')
+    if visage_change not in ('oui', 'non'):
+        errors.append('Veuillez indiquer si le visage a été changé.')
+    if visage_nettoye not in ('oui', 'non'):
+        errors.append('Veuillez indiquer si le visage a été nettoyé.')
     if reparation not in ('oui', 'non'):
         errors.append('Veuillez indiquer si une réparation a été effectuée.')
     if reparation == 'oui' and not description_reparation:
@@ -445,15 +451,17 @@ def formulaire_submit():
     cursor = conn.execute(
         '''INSERT INTO interventions
            (mannequin_id, date, prenom, nom, type_formation, type_formation_autre,
-            nettoyage, changement_poumons,
+            nettoyage, changement_poumons, visage_change, visage_nettoye,
             reparation, description_reparation, informations, signature_path)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
         (
             mannequin_id, date, prenom, nom,
             type_formation,
             type_formation_autre if type_formation == 'autre' else '',
             1 if nettoyage == 'oui' else 0,
             1 if changement_poumons == 'oui' else 0,
+            1 if visage_change == 'oui' else 0,
+            1 if visage_nettoye == 'oui' else 0,
             1 if reparation == 'oui' else 0,
             description_reparation if reparation == 'oui' else '',
             informations, signature_path
