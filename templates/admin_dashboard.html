@@ -112,58 +112,6 @@
     </div>
 
     <div class="section">
-        <p class="section-head"><i class="ti ti-history"></i> Dernières interventions</p>
-
-        {% if recent %}
-        <div class="table-wrap admin-table">
-            <table>
-                <thead><tr><th>Date</th><th>Mannequin</th><th>Par</th><th class="tc">Nett.</th><th class="tc">Poumons</th><th class="tc">Visage ch.</th><th class="tc">Visage nett.</th><th class="tc">État</th><th class="tc">Répar.</th></tr></thead>
-                <tbody>
-                    {% for i in recent %}
-                    <tr>
-                        <td>{{ i.date|date_fr }}</td>
-                        <td><span class="badge badge-{{ i.m_type|lower }}">{{ i.m_type }}</span> N°{{ i.m_numero }}</td>
-                        <td>{{ i.prenom }} {{ i.nom }}</td>
-                        <td class="tc">{% if i.nettoyage %}<i class="ti ti-circle-check st-yes"></i>{% else %}<i class="ti ti-circle-x st-no"></i>{% endif %}</td>
-                        <td class="tc">{% if i.changement_poumons %}<i class="ti ti-circle-check st-yes"></i>{% else %}<i class="ti ti-circle-x st-no"></i>{% endif %}</td>
-                        <td class="tc">{% if i.visage_change is none %}<span class="st-no">-</span>{% elif i.visage_change %}<i class="ti ti-circle-check st-yes"></i>{% else %}<i class="ti ti-circle-x st-no"></i>{% endif %}</td>
-                        <td class="tc">{% if i.visage_nettoye is none %}<span class="st-no">-</span>{% elif i.visage_nettoye %}<i class="ti ti-circle-check st-yes"></i>{% else %}<i class="ti ti-circle-x st-no"></i>{% endif %}</td>
-                        <td class="tc">{% if i.etat %}{{ etat_tag(i.etat, court=true) }}{% else %}<span class="st-no">-</span>{% endif %}</td>
-                        <td class="tc">{% if i.etat is none or i.etat == 'defaut' %}{% if i.reparation %}<i class="ti ti-circle-x st-warn"></i>{% else %}<i class="ti ti-circle-check st-ok"></i>{% endif %}{% else %}<span class="st-no">-</span>{% endif %}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-
-        <div class="admin-cards">
-            {% for i in recent %}
-            <div class="data-card">
-                <div class="data-card-head">
-                    <span class="data-card-title"><span class="badge badge-{{ i.m_type|lower }}">{{ i.m_type }}</span> <strong>N°{{ i.m_numero }}</strong></span>
-                    <span class="data-card-date">{{ i.date|date_fr }}</span>
-                </div>
-                <div class="data-card-meta"><i class="ti ti-user"></i> {{ i.prenom }} {{ i.nom }}</div>
-                <div class="data-card-chips">
-                    {% if i.nettoyage %}<span class="detail-tag tag-green"><i class="ti ti-circle-check"></i> Nettoyage</span>{% else %}<span class="detail-tag tag-gray"><i class="ti ti-circle-x"></i> Nettoyage</span>{% endif %}
-                    {% if i.changement_poumons %}<span class="detail-tag tag-green"><i class="ti ti-circle-check"></i> Poumons</span>{% else %}<span class="detail-tag tag-gray"><i class="ti ti-circle-x"></i> Poumons</span>{% endif %}
-                    {% if i.visage_change is not none %}{% if i.visage_change %}<span class="detail-tag tag-green"><i class="ti ti-circle-check"></i> Visage changé</span>{% else %}<span class="detail-tag tag-gray"><i class="ti ti-circle-x"></i> Visage changé</span>{% endif %}{% endif %}
-                    {% if i.visage_nettoye is not none %}{% if i.visage_nettoye %}<span class="detail-tag tag-green"><i class="ti ti-circle-check"></i> Visage nettoyé</span>{% else %}<span class="detail-tag tag-gray"><i class="ti ti-circle-x"></i> Visage nettoyé</span>{% endif %}{% endif %}
-                    {% if i.etat %}{{ etat_tag(i.etat, court=true) }}{% endif %}
-                    {% if i.etat is none or i.etat == 'defaut' %}{% if i.reparation %}<span class="detail-tag tag-red"><i class="ti ti-alert-triangle"></i> Réparation</span>{% else %}<span class="detail-tag tag-green"><i class="ti ti-circle-check"></i> Réparation</span>{% endif %}{% endif %}
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-        {% else %}
-        <div class="empty-state">
-            <i class="ti ti-clipboard-off"></i>
-            Aucune intervention enregistrée.
-        </div>
-        {% endif %}
-    </div>
-
-    <div class="section section-full">
         <p class="section-head"><i class="ti ti-user-plus"></i> Gestion des intervenants</p>
 
         <form method="POST" action="{{ url_for('admin_add_intervenant') }}" class="add-row">
@@ -208,6 +156,58 @@
         <div class="empty-state">
             <i class="ti ti-user-off"></i>
             Aucun intervenant enregistré.
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="section section-full suivis-recents">
+        <p class="section-head"><i class="ti ti-history"></i> Dernières interventions</p>
+
+        {% if recent %}
+        <div class="table-wrap admin-table">
+            <table>
+                <thead><tr><th>Date</th><th>Mannequin</th><th>Par</th><th class="tc">Nettoyage</th><th class="tc">Poumons</th><th class="tc">Visage changé</th><th class="tc">Visage nettoyé</th><th class="tc">État</th><th class="tc">Réparation</th></tr></thead>
+                <tbody>
+                    {% for i in recent %}
+                    <tr>
+                        <td>{{ i.date|date_fr }}</td>
+                        <td><span class="badge badge-{{ i.m_type|lower }}">{{ i.m_type }}</span> N°{{ i.m_numero }}</td>
+                        <td>{{ i.prenom }} {{ i.nom }}</td>
+                        <td class="tc">{% if i.nettoyage %}<i class="ti ti-circle-check st-yes"></i>{% else %}<i class="ti ti-circle-x st-no"></i>{% endif %}</td>
+                        <td class="tc">{% if i.changement_poumons %}<i class="ti ti-circle-check st-yes"></i>{% else %}<i class="ti ti-circle-x st-no"></i>{% endif %}</td>
+                        <td class="tc">{% if i.visage_change is none %}<span class="st-no">-</span>{% elif i.visage_change %}<i class="ti ti-circle-check st-yes"></i>{% else %}<i class="ti ti-circle-x st-no"></i>{% endif %}</td>
+                        <td class="tc">{% if i.visage_nettoye is none %}<span class="st-no">-</span>{% elif i.visage_nettoye %}<i class="ti ti-circle-check st-yes"></i>{% else %}<i class="ti ti-circle-x st-no"></i>{% endif %}</td>
+                        <td class="tc">{% if i.etat %}{{ etat_tag(i.etat, court=true) }}{% else %}<span class="st-no">-</span>{% endif %}</td>
+                        <td class="tc">{% if i.etat is none or i.etat == 'defaut' %}{% if i.reparation %}<i class="ti ti-circle-x st-warn"></i>{% else %}<i class="ti ti-circle-check st-ok"></i>{% endif %}{% else %}<span class="st-no">-</span>{% endif %}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="admin-cards">
+            {% for i in recent %}
+            <div class="data-card">
+                <div class="data-card-head">
+                    <span class="data-card-title"><span class="badge badge-{{ i.m_type|lower }}">{{ i.m_type }}</span> <strong>N°{{ i.m_numero }}</strong></span>
+                    <span class="data-card-date">{{ i.date|date_fr }}</span>
+                </div>
+                <div class="data-card-meta"><i class="ti ti-user"></i> {{ i.prenom }} {{ i.nom }}</div>
+                <div class="data-card-chips">
+                    {% if i.nettoyage %}<span class="detail-tag tag-green"><i class="ti ti-circle-check"></i> Nettoyage</span>{% else %}<span class="detail-tag tag-gray"><i class="ti ti-circle-x"></i> Nettoyage</span>{% endif %}
+                    {% if i.changement_poumons %}<span class="detail-tag tag-green"><i class="ti ti-circle-check"></i> Poumons</span>{% else %}<span class="detail-tag tag-gray"><i class="ti ti-circle-x"></i> Poumons</span>{% endif %}
+                    {% if i.visage_change is not none %}{% if i.visage_change %}<span class="detail-tag tag-green"><i class="ti ti-circle-check"></i> Visage changé</span>{% else %}<span class="detail-tag tag-gray"><i class="ti ti-circle-x"></i> Visage changé</span>{% endif %}{% endif %}
+                    {% if i.visage_nettoye is not none %}{% if i.visage_nettoye %}<span class="detail-tag tag-green"><i class="ti ti-circle-check"></i> Visage nettoyé</span>{% else %}<span class="detail-tag tag-gray"><i class="ti ti-circle-x"></i> Visage nettoyé</span>{% endif %}{% endif %}
+                    {% if i.etat %}{{ etat_tag(i.etat, court=true) }}{% endif %}
+                    {% if i.etat is none or i.etat == 'defaut' %}{% if i.reparation %}<span class="detail-tag tag-red"><i class="ti ti-alert-triangle"></i> Réparation</span>{% else %}<span class="detail-tag tag-green"><i class="ti ti-circle-check"></i> Réparation</span>{% endif %}{% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="ti ti-clipboard-off"></i>
+            Aucune intervention enregistrée.
         </div>
         {% endif %}
     </div>
