@@ -1479,6 +1479,22 @@ tbody tr:last-child td { border-bottom: none; }
     .admin-grid > .section-full { grid-column: 1 / -1; }
 }
 
+/* Listes de suivis : le tableau n'est affiché que s'il tient en entier dans
+   son panneau, sinon les cartes prennent le relais (jamais de défilement
+   horizontal). Seuils = largeur minimale de chaque tableau. */
+.suivis-recents    { container: suivis-recents / inline-size; }
+.suivis-historique { container: suivis-historique / inline-size; }
+
+@container suivis-recents (max-width: 870px) {
+    .admin-table { display: none; }
+    .admin-cards { display: flex; }
+}
+
+@container suivis-historique (max-width: 1170px) {
+    .admin-table { display: none; }
+    .admin-cards { display: flex; }
+}
+
 /* ── Mobile ────────────────────────────────────────── */
 
 /* ═══════════════════════════════════════════════════════
