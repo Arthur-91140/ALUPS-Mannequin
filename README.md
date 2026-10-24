@@ -1,6 +1,6 @@
 # ALUPS — Suivi des Mannequins
 
-Application web de traçabilité des mannequins de formation (nettoyage, changement des poumons, réparation).
+Application web de traçabilité des mannequins de formation (nettoyage, changement des poumons, changement et nettoyage du visage, réparation).
 
 ## Fonctionnalités
 
