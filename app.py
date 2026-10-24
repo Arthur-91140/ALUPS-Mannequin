@@ -94,6 +94,20 @@ def formation_label(row):
 app.jinja_env.globals['formation_label'] = formation_label
 
 
+def date_fr(value):
+    """Date stockée en AAAA-MM-JJ (ou horodatage AAAA-MM-JJ HH:MM:SS)
+    -> JJ/MM/AAAA. Renvoie la valeur telle quelle si elle n'est pas reconnue."""
+    if not value:
+        return ''
+    try:
+        return datetime.strptime(str(value)[:10], '%Y-%m-%d').strftime('%d/%m/%Y')
+    except ValueError:
+        return value
+
+
+app.jinja_env.filters['date_fr'] = date_fr
+
+
 # ── Database ──────────────────────────────────────────────
 
 def get_db():
