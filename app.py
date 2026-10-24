@@ -69,6 +69,14 @@ STATUTS = {
 }
 DEFAULT_STATUT = 'operationnel'
 
+# État du mannequin saisi dans le formulaire (clé -> libellé). Les clés sont
+# celles de STATUTS : l'envoi du formulaire met à jour le statut du mannequin.
+ETATS = {
+    'operationnel': 'Pleinement opérationnel',
+    'defaut':       'A un défaut mais utilisable',
+    'hors_service': 'Hors service',
+}
+
 # Types de formation possibles pour une intervention (clé stockée -> libellé)
 TYPES_FORMATION = {
     'psc':       'PSC',
@@ -194,6 +202,17 @@ def init_db():
         conn.execute('ALTER TABLE interventions ADD COLUMN date_formation TEXT')
     except sqlite3.OperationalError:
         pass  # Column already exists
+
+    # État du mannequin (clé de ETATS) et son détail ; NULL pour les
+    # interventions saisies avant, qui n'ont que réparation oui / non
+    for ddl in (
+        "ALTER TABLE interventions ADD COLUMN etat TEXT",
+        "ALTER TABLE interventions ADD COLUMN etat_detail TEXT DEFAULT ''",
+    ):
+        try:
+            conn.execute(ddl)
+        except sqlite3.OperationalError:
+            pass  # Column already exists
 
     # Statut des mannequins (migration additive, préserve l'existant)
     for ddl in (
