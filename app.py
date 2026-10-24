@@ -94,7 +94,7 @@ def formation_label(row):
     key = (row['type_formation'] if 'type_formation' in keys else '') or ''
     if key == 'autre':
         precision = (row['type_formation_autre'] if 'type_formation_autre' in keys else '') or ''
-        return f'Autre — {precision}' if precision else 'Autre'
+        return f'Autre - {precision}' if precision else 'Autre'
     return TYPES_FORMATION.get(key, '')
 
 
@@ -1369,7 +1369,7 @@ def admin_export_mannequin(mannequin_id):
     output = _build_tracabilite_xlsx(
         interventions,
         f"{mannequin['type']} N°{mannequin['numero']}",
-        f"TRAÇABILITÉ — {mannequin['type']} N°{mannequin['numero']}",
+        f"TRAÇABILITÉ - {mannequin['type']} N°{mannequin['numero']}",
         photos_map
     )
 
