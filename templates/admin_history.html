@@ -1,6 +1,7 @@
 {% extends "base_admin.html" %}
 {% from "_etat.html" import etat_tag %}
 {% block title %}Historique - {{ mannequin.type }} N°{{ mannequin.numero }}{% endblock %}
+{% block content_class %}admin-content--wide{% endblock %}
 
 {% block content %}
 <div class="admin-bar">
@@ -16,7 +17,7 @@
             data-size-avec="{{ export_pair[1] }}"><i class="ti ti-file-spreadsheet"></i> Excel</button>
 </div>
 
-<div class="section">
+<div class="section suivis-historique">
     <p class="section-head"><i class="ti ti-list"></i> {{ interventions|length }} intervention(s)</p>
 
     {% if interventions %}
