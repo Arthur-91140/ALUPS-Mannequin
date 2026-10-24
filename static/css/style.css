@@ -510,6 +510,17 @@ tbody tr:last-child td { border-bottom: none; }
     box-shadow: 0 2px 8px rgba(200,16,46,0.3);
 }
 
+/* Couleurs inversées quand « non » est la bonne réponse (ex. réparation) */
+.toggle-inverse input:checked + .t-oui {
+    background: var(--red);
+    box-shadow: 0 2px 8px rgba(200,16,46,0.3);
+}
+
+.toggle-inverse input:checked + .t-non {
+    background: var(--green);
+    box-shadow: 0 2px 8px rgba(16,185,129,0.35);
+}
+
 /* ── Signature ─────────────────────────────────────── */
 
 .sig-box {
