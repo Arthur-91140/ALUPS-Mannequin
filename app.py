@@ -174,6 +174,13 @@ def init_db():
         except sqlite3.OperationalError:
             pass  # Column already exists
 
+    # Date de la formation, distincte de la date de saisie (colonne date) ;
+    # NULL pour les interventions saisies avant l'ajout de ce champ
+    try:
+        conn.execute('ALTER TABLE interventions ADD COLUMN date_formation TEXT')
+    except sqlite3.OperationalError:
+        pass  # Column already exists
+
     # Statut des mannequins (migration additive, préserve l'existant)
     for ddl in (
         "ALTER TABLE mannequins ADD COLUMN statut TEXT DEFAULT 'operationnel'",
