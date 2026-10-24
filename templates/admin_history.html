@@ -21,11 +21,12 @@
     {% if interventions %}
     <div class="table-wrap admin-table">
         <table>
-            <thead><tr><th>Date</th><th>Prénom</th><th>Nom</th><th>Formation</th><th class="tc">Nettoyage</th><th class="tc">Poumons</th><th class="tc">Visage changé</th><th class="tc">Visage nettoyé</th><th class="tc">Réparation</th><th class="tc">Photos</th><th class="tr">Actions</th></tr></thead>
+            <thead><tr><th>Date de saisie</th><th>Date de la formation</th><th>Prénom</th><th>Nom</th><th>Formation</th><th class="tc">Nettoyage</th><th class="tc">Poumons</th><th class="tc">Visage changé</th><th class="tc">Visage nettoyé</th><th class="tc">Réparation</th><th class="tc">Photos</th><th class="tr">Actions</th></tr></thead>
             <tbody>
                 {% for i in interventions %}
                 <tr class="row-link" onclick="window.location='{{ url_for('admin_intervention_detail', intervention_id=i.id) }}'">
                     <td>{{ i.date }}</td>
+                    <td>{% if i.date_formation %}{{ i.date_formation }}{% else %}<span class="st-no">—</span>{% endif %}</td>
                     <td>{{ i.prenom }}</td>
                     <td>{{ i.nom }}</td>
                     <td>{{ formation_label(i) }}</td>
@@ -57,7 +58,7 @@
                 </span>
             </div>
             <div class="data-card-meta"><i class="ti ti-user"></i> {{ i.prenom }} {{ i.nom }}</div>
-            <div class="data-card-meta"><i class="ti ti-certificate"></i> {{ formation_label(i) }}</div>
+            <div class="data-card-meta"><i class="ti ti-certificate"></i> {{ formation_label(i) }}{% if i.date_formation %} le {{ i.date_formation }}{% endif %}</div>
             <div class="data-card-chips">
                 {% if i.nettoyage %}<span class="detail-tag tag-green"><i class="ti ti-circle-check"></i> Nettoyage</span>{% else %}<span class="detail-tag tag-gray"><i class="ti ti-circle-x"></i> Nettoyage</span>{% endif %}
                 {% if i.changement_poumons %}<span class="detail-tag tag-green"><i class="ti ti-circle-check"></i> Poumons</span>{% else %}<span class="detail-tag tag-gray"><i class="ti ti-circle-x"></i> Poumons</span>{% endif %}
