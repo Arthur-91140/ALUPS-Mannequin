@@ -1116,7 +1116,7 @@ def _build_tracabilite_xlsx(interventions, sheet_title, doc_title, photos_by_int
     max_photos = 0
     if with_photos:
         max_photos = max((len(v) for v in photos_by_intervention.values()), default=0)
-    last_col = 18 + max_photos  # R = 18 (date de la formation), puis une colonne par photo
+    last_col = 20 + max_photos  # T = 20 (date de la formation), puis une colonne par photo
     last_letter = get_column_letter(last_col)
 
     wb = openpyxl.Workbook()
@@ -1133,6 +1133,11 @@ def _build_tracabilite_xlsx(interventions, sheet_title, doc_title, photos_by_int
         left=Side(style='thin'), right=Side(style='thin'),
         top=Side(style='thin'), bottom=Side(style='thin')
     )
+    # Fond de la cellule « État du mannequin » : vert / orange / rouge
+    etat_fills = {
+        etat: PatternFill(start_color=couleur, end_color=couleur, fill_type='solid')
+        for etat, couleur in (('operationnel', 'D1FAE5'), ('defaut', 'FFEDD5'), ('hors_service', 'FDE4E8'))
+    }
 
     # Ligne 1 : titre
     ws.merge_cells(f'A1:{last_letter}1')
@@ -1146,16 +1151,17 @@ def _build_tracabilite_xlsx(interventions, sheet_title, doc_title, photos_by_int
         'A': 'Date de saisie', 'B': 'Prénom', 'C': 'Nom', 'D': 'N° de mannequin',
         'E': 'Nettoyage', 'G': 'Changement des poumons',
         'I': 'Visage changé', 'K': 'Visage nettoyé',
-        'M': 'Réparation', 'O': 'Informations à communiquer ?', 'P': 'Signature',
-        'Q': 'Type de formation', 'R': 'Date de la formation'
+        'M': 'État du mannequin', 'N': 'Réparation', 'P': 'Détail',
+        'Q': 'Informations à communiquer ?', 'R': 'Signature',
+        'S': 'Type de formation', 'T': 'Date de la formation'
     }
-    for col in ['A', 'B', 'C', 'D', 'O', 'P', 'Q', 'R']:
+    for col in ['A', 'B', 'C', 'D', 'M', 'P', 'Q', 'R', 'S', 'T']:
         ws.merge_cells(f'{col}2:{col}3')
     ws.merge_cells('E2:F2')
     ws.merge_cells('G2:H2')
     ws.merge_cells('I2:J2')
     ws.merge_cells('K2:L2')
-    ws.merge_cells('M2:N2')
+    ws.merge_cells('N2:O2')
 
     for col, text in headers_row2.items():
         cell = ws[f'{col}2']
@@ -1166,7 +1172,7 @@ def _build_tracabilite_xlsx(interventions, sheet_title, doc_title, photos_by_int
         cell.border = thin_border
 
     sub_headers = {'E': 'oui', 'F': 'non', 'G': 'oui', 'H': 'non', 'I': 'oui', 'J': 'non',
-                   'K': 'oui', 'L': 'non', 'M': 'oui', 'N': 'non'}
+                   'K': 'oui', 'L': 'non', 'N': 'oui', 'O': 'non'}
     for col, text in sub_headers.items():
         cell = ws[f'{col}3']
         cell.value = text
@@ -1176,24 +1182,24 @@ def _build_tracabilite_xlsx(interventions, sheet_title, doc_title, photos_by_int
         cell.border = thin_border
 
     for row in [2, 3]:
-        for col_idx in range(1, 19):
+        for col_idx in range(1, 21):
             cell = ws.cell(row=row, column=col_idx)
             if cell.value is None and row == 2:
                 cell.fill = header_fill
-            if row == 3 and col_idx in [1, 2, 3, 4, 15, 16, 17, 18]:
+            if row == 3 and col_idx in [1, 2, 3, 4, 13, 16, 17, 18, 19, 20]:
                 cell.fill = header_fill
             cell.border = thin_border
 
-    # En-tête "Photos" au-dessus des colonnes photos (à partir de la colonne S)
+    # En-tête "Photos" au-dessus des colonnes photos (à partir de la colonne U)
     if with_photos and max_photos > 0:
-        ws.merge_cells(f'S2:{last_letter}3')
-        cell = ws['S2']
+        ws.merge_cells(f'U2:{last_letter}3')
+        cell = ws['U2']
         cell.value = 'Photos'
         cell.font = header_font
         cell.fill = header_fill
         cell.alignment = center
         cell.border = thin_border
-        for col_idx in range(19, last_col + 1):
+        for col_idx in range(21, last_col + 1):
             for r in (2, 3):
                 c = ws.cell(row=r, column=col_idx)
                 c.fill = header_fill
@@ -1203,18 +1209,19 @@ def _build_tracabilite_xlsx(interventions, sheet_title, doc_title, photos_by_int
     ws.row_dimensions[3].height = 20
 
     col_widths = {'A': 14, 'B': 14, 'C': 14, 'D': 20, 'E': 6, 'F': 6,
-                  'G': 6, 'H': 6, 'I': 6, 'J': 6, 'K': 6, 'L': 6, 'M': 6, 'N': 6,
-                  'O': 28, 'P': 18, 'Q': 22, 'R': 16}
+                  'G': 6, 'H': 6, 'I': 6, 'J': 6, 'K': 6, 'L': 6, 'M': 16, 'N': 6,
+                  'O': 6, 'P': 28, 'Q': 28, 'R': 18, 'S': 22, 'T': 16}
     for col, width in col_widths.items():
         ws.column_dimensions[col].width = width
     for pj in range(max_photos):
-        ws.column_dimensions[get_column_letter(19 + pj)].width = 24
+        ws.column_dimensions[get_column_letter(21 + pj)].width = 24
 
     row_height = 72 if (with_photos and max_photos > 0) else 60
 
     for idx, inter in enumerate(interventions):
         row = idx + 4
         ws.row_dimensions[row].height = row_height
+        avec_reparation = inter['etat'] in (None, 'defaut')
 
         data = [
             _date_xlsx(inter['date']), inter['prenom'], inter['nom'],
@@ -1228,8 +1235,11 @@ def _build_tracabilite_xlsx(interventions, sheet_title, doc_title, photos_by_int
             'X' if inter['visage_change'] == 0 else '',
             'X' if inter['visage_nettoye'] == 1 else '',
             'X' if inter['visage_nettoye'] == 0 else '',
-            'X' if inter['reparation'] else '',
-            '' if inter['reparation'] else 'X',
+            ETATS.get(inter['etat'], ''),
+            # Réparation : uniquement pour un défaut (ou les interventions antérieures)
+            'X' if avec_reparation and inter['reparation'] else '',
+            'X' if avec_reparation and not inter['reparation'] else '',
+            inter['etat_detail'] or inter['description_reparation'] or '',
             inter['informations'] or '',
         ]
 
@@ -1239,17 +1249,19 @@ def _build_tracabilite_xlsx(interventions, sheet_title, doc_title, photos_by_int
             cell.border = thin_border
             cell.font = Font(name='Arial', size=10)
         ws.cell(row=row, column=1).number_format = 'DD/MM/YYYY'
+        if inter['etat'] in etat_fills:
+            ws.cell(row=row, column=13).fill = etat_fills[inter['etat']]
 
-        ws.cell(row=row, column=16).border = thin_border
+        ws.cell(row=row, column=18).border = thin_border
 
-        # Type de formation (colonne Q)
-        fcell = ws.cell(row=row, column=17, value=formation_label(inter))
+        # Type de formation (colonne S)
+        fcell = ws.cell(row=row, column=19, value=formation_label(inter))
         fcell.alignment = left_center
         fcell.border = thin_border
         fcell.font = Font(name='Arial', size=10)
 
-        # Date de la formation (colonne R), vide pour les interventions antérieures
-        dcell = ws.cell(row=row, column=18, value=_date_xlsx(inter['date_formation']))
+        # Date de la formation (colonne T), vide pour les interventions antérieures
+        dcell = ws.cell(row=row, column=20, value=_date_xlsx(inter['date_formation']))
         dcell.number_format = 'DD/MM/YYYY'
         dcell.alignment = left_center
         dcell.border = thin_border
@@ -1263,9 +1275,9 @@ def _build_tracabilite_xlsx(interventions, sheet_title, doc_title, photos_by_int
                     img = XlImage(sig_file)
                     img.width = 120
                     img.height = 50
-                    ws.add_image(img, f'P{row}')
+                    ws.add_image(img, f'R{row}')
                 except Exception:
-                    ws.cell(row=row, column=16, value='[signature]')
+                    ws.cell(row=row, column=18, value='[signature]')
 
         # Photos
         if with_photos:
@@ -1284,7 +1296,7 @@ def _build_tracabilite_xlsx(interventions, sheet_title, doc_title, photos_by_int
                         ratio2 = 150 / float(img.width)
                         img.width = 150
                         img.height = int(img.height * ratio2)
-                    ws.add_image(img, f'{get_column_letter(19 + pj)}{row}')
+                    ws.add_image(img, f'{get_column_letter(21 + pj)}{row}')
                 except Exception:
                     pass
 
