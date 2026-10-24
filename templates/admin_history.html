@@ -21,7 +21,7 @@
     {% if interventions %}
     <div class="table-wrap admin-table">
         <table>
-            <thead><tr><th>Date</th><th>Prénom</th><th>Nom</th><th>Formation</th><th class="tc">Nettoyage</th><th class="tc">Poumons</th><th class="tc">Réparation</th><th class="tc">Photos</th><th class="tr">Actions</th></tr></thead>
+            <thead><tr><th>Date</th><th>Prénom</th><th>Nom</th><th>Formation</th><th class="tc">Nettoyage</th><th class="tc">Poumons</th><th class="tc">Visage changé</th><th class="tc">Visage nettoyé</th><th class="tc">Réparation</th><th class="tc">Photos</th><th class="tr">Actions</th></tr></thead>
             <tbody>
                 {% for i in interventions %}
                 <tr class="row-link" onclick="window.location='{{ url_for('admin_intervention_detail', intervention_id=i.id) }}'">
@@ -31,6 +31,8 @@
                     <td>{{ formation_label(i) }}</td>
                     <td class="tc">{% if i.nettoyage %}<i class="ti ti-circle-check st-yes"></i>{% else %}<i class="ti ti-circle-x st-no"></i>{% endif %}</td>
                     <td class="tc">{% if i.changement_poumons %}<i class="ti ti-circle-check st-yes"></i>{% else %}<i class="ti ti-circle-x st-no"></i>{% endif %}</td>
+                    <td class="tc">{% if i.visage_change is none %}<span class="st-no">—</span>{% elif i.visage_change %}<i class="ti ti-circle-check st-yes"></i>{% else %}<i class="ti ti-circle-x st-no"></i>{% endif %}</td>
+                    <td class="tc">{% if i.visage_nettoye is none %}<span class="st-no">—</span>{% elif i.visage_nettoye %}<i class="ti ti-circle-check st-yes"></i>{% else %}<i class="ti ti-circle-x st-no"></i>{% endif %}</td>
                     <td class="tc">{% if i.reparation %}<i class="ti ti-alert-triangle st-warn"></i>{% else %}<i class="ti ti-circle-check st-ok"></i>{% endif %}</td>
                     <td class="tc">
                         {% set nb = photos_by_intervention.get(i.id, [])|length %}
@@ -59,6 +61,8 @@
             <div class="data-card-chips">
                 {% if i.nettoyage %}<span class="detail-tag tag-green"><i class="ti ti-circle-check"></i> Nettoyage</span>{% else %}<span class="detail-tag tag-gray"><i class="ti ti-circle-x"></i> Nettoyage</span>{% endif %}
                 {% if i.changement_poumons %}<span class="detail-tag tag-green"><i class="ti ti-circle-check"></i> Poumons</span>{% else %}<span class="detail-tag tag-gray"><i class="ti ti-circle-x"></i> Poumons</span>{% endif %}
+                {% if i.visage_change is not none %}{% if i.visage_change %}<span class="detail-tag tag-green"><i class="ti ti-circle-check"></i> Visage changé</span>{% else %}<span class="detail-tag tag-gray"><i class="ti ti-circle-x"></i> Visage changé</span>{% endif %}{% endif %}
+                {% if i.visage_nettoye is not none %}{% if i.visage_nettoye %}<span class="detail-tag tag-green"><i class="ti ti-circle-check"></i> Visage nettoyé</span>{% else %}<span class="detail-tag tag-gray"><i class="ti ti-circle-x"></i> Visage nettoyé</span>{% endif %}{% endif %}
                 {% if i.reparation %}<span class="detail-tag tag-red"><i class="ti ti-alert-triangle"></i> Réparation</span>{% else %}<span class="detail-tag tag-green"><i class="ti ti-circle-check"></i> Réparation</span>{% endif %}
                 {% set nb = photos_by_intervention.get(i.id, [])|length %}
                 {% if nb %}<span class="detail-tag tag-gray"><i class="ti ti-camera"></i> {{ nb }} photo{{ 's' if nb != 1 else '' }}</span>{% endif %}
