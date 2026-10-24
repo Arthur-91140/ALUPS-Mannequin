@@ -1052,6 +1052,15 @@ def _export_sizes():
     return full, by_mannequin
 
 
+def _date_xlsx(value):
+    """Date AAAA-MM-JJ -> vraie date Excel (affichée en JJ/MM/AAAA via
+    number_format). Renvoie la valeur telle quelle si elle n'est pas reconnue."""
+    try:
+        return datetime.strptime(value[:10], '%Y-%m-%d').date()
+    except (TypeError, ValueError):
+        return value or ''
+
+
 def _photos_by_intervention(conn, ids):
     """Retourne {intervention_id: [filenames]} pour les interventions données."""
     result = {}
@@ -1176,7 +1185,7 @@ def _build_tracabilite_xlsx(interventions, sheet_title, doc_title, photos_by_int
         ws.row_dimensions[row].height = row_height
 
         data = [
-            inter['date'], inter['prenom'], inter['nom'],
+            _date_xlsx(inter['date']), inter['prenom'], inter['nom'],
             f"{inter['m_type']} N°{inter['m_numero']}",
             'X' if inter['nettoyage'] else '',
             '' if inter['nettoyage'] else 'X',
@@ -1197,6 +1206,7 @@ def _build_tracabilite_xlsx(interventions, sheet_title, doc_title, photos_by_int
             cell.alignment = center if col_idx >= 5 else left_center
             cell.border = thin_border
             cell.font = Font(name='Arial', size=10)
+        ws.cell(row=row, column=1).number_format = 'DD/MM/YYYY'
 
         ws.cell(row=row, column=16).border = thin_border
 
@@ -1207,7 +1217,8 @@ def _build_tracabilite_xlsx(interventions, sheet_title, doc_title, photos_by_int
         fcell.font = Font(name='Arial', size=10)
 
         # Date de la formation (colonne R), vide pour les interventions antérieures
-        dcell = ws.cell(row=row, column=18, value=inter['date_formation'] or '')
+        dcell = ws.cell(row=row, column=18, value=_date_xlsx(inter['date_formation']))
+        dcell.number_format = 'DD/MM/YYYY'
         dcell.alignment = left_center
         dcell.border = thin_border
         dcell.font = Font(name='Arial', size=10)
