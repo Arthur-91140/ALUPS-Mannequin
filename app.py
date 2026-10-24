@@ -1051,7 +1051,7 @@ def _build_tracabilite_xlsx(interventions, sheet_title, doc_title, photos_by_int
     max_photos = 0
     if with_photos:
         max_photos = max((len(v) for v in photos_by_intervention.values()), default=0)
-    last_col = 13 + max_photos  # M = 13 (type de formation), puis une colonne par photo
+    last_col = 17 + max_photos  # Q = 17 (type de formation), puis une colonne par photo
     last_letter = get_column_letter(last_col)
 
     wb = openpyxl.Workbook()
@@ -1080,14 +1080,17 @@ def _build_tracabilite_xlsx(interventions, sheet_title, doc_title, photos_by_int
     headers_row2 = {
         'A': 'Date', 'B': 'Prénom', 'C': 'Nom', 'D': 'N° de mannequin',
         'E': 'Nettoyage', 'G': 'Changement des poumons',
-        'I': 'Réparation', 'K': 'Informations à communiquer ?', 'L': 'Signature',
-        'M': 'Type de formation'
+        'I': 'Visage changé', 'K': 'Visage nettoyé',
+        'M': 'Réparation', 'O': 'Informations à communiquer ?', 'P': 'Signature',
+        'Q': 'Type de formation'
     }
-    for col in ['A', 'B', 'C', 'D', 'K', 'L', 'M']:
+    for col in ['A', 'B', 'C', 'D', 'O', 'P', 'Q']:
         ws.merge_cells(f'{col}2:{col}3')
     ws.merge_cells('E2:F2')
     ws.merge_cells('G2:H2')
     ws.merge_cells('I2:J2')
+    ws.merge_cells('K2:L2')
+    ws.merge_cells('M2:N2')
 
     for col, text in headers_row2.items():
         cell = ws[f'{col}2']
@@ -1097,7 +1100,8 @@ def _build_tracabilite_xlsx(interventions, sheet_title, doc_title, photos_by_int
         cell.alignment = center
         cell.border = thin_border
 
-    sub_headers = {'E': 'oui', 'F': 'non', 'G': 'oui', 'H': 'non', 'I': 'oui', 'J': 'non'}
+    sub_headers = {'E': 'oui', 'F': 'non', 'G': 'oui', 'H': 'non', 'I': 'oui', 'J': 'non',
+                   'K': 'oui', 'L': 'non', 'M': 'oui', 'N': 'non'}
     for col, text in sub_headers.items():
         cell = ws[f'{col}3']
         cell.value = text
@@ -1107,24 +1111,24 @@ def _build_tracabilite_xlsx(interventions, sheet_title, doc_title, photos_by_int
         cell.border = thin_border
 
     for row in [2, 3]:
-        for col_idx in range(1, 14):
+        for col_idx in range(1, 18):
             cell = ws.cell(row=row, column=col_idx)
             if cell.value is None and row == 2:
                 cell.fill = header_fill
-            if row == 3 and col_idx in [1, 2, 3, 4, 11, 12, 13]:
+            if row == 3 and col_idx in [1, 2, 3, 4, 15, 16, 17]:
                 cell.fill = header_fill
             cell.border = thin_border
 
-    # En-tête "Photos" au-dessus des colonnes photos (à partir de la colonne N)
+    # En-tête "Photos" au-dessus des colonnes photos (à partir de la colonne R)
     if with_photos and max_photos > 0:
-        ws.merge_cells(f'N2:{last_letter}3')
-        cell = ws['N2']
+        ws.merge_cells(f'R2:{last_letter}3')
+        cell = ws['R2']
         cell.value = 'Photos'
         cell.font = header_font
         cell.fill = header_fill
         cell.alignment = center
         cell.border = thin_border
-        for col_idx in range(14, last_col + 1):
+        for col_idx in range(18, last_col + 1):
             for r in (2, 3):
                 c = ws.cell(row=r, column=col_idx)
                 c.fill = header_fill
@@ -1134,11 +1138,12 @@ def _build_tracabilite_xlsx(interventions, sheet_title, doc_title, photos_by_int
     ws.row_dimensions[3].height = 20
 
     col_widths = {'A': 14, 'B': 14, 'C': 14, 'D': 20, 'E': 6, 'F': 6,
-                  'G': 6, 'H': 6, 'I': 6, 'J': 6, 'K': 28, 'L': 18, 'M': 22}
+                  'G': 6, 'H': 6, 'I': 6, 'J': 6, 'K': 6, 'L': 6, 'M': 6, 'N': 6,
+                  'O': 28, 'P': 18, 'Q': 22}
     for col, width in col_widths.items():
         ws.column_dimensions[col].width = width
     for pj in range(max_photos):
-        ws.column_dimensions[get_column_letter(14 + pj)].width = 24
+        ws.column_dimensions[get_column_letter(18 + pj)].width = 24
 
     row_height = 72 if (with_photos and max_photos > 0) else 60
 
@@ -1153,6 +1158,11 @@ def _build_tracabilite_xlsx(interventions, sheet_title, doc_title, photos_by_int
             '' if inter['nettoyage'] else 'X',
             'X' if inter['changement_poumons'] else '',
             '' if inter['changement_poumons'] else 'X',
+            # Visage : cases vides pour les interventions antérieures (NULL)
+            'X' if inter['visage_change'] == 1 else '',
+            'X' if inter['visage_change'] == 0 else '',
+            'X' if inter['visage_nettoye'] == 1 else '',
+            'X' if inter['visage_nettoye'] == 0 else '',
             'X' if inter['reparation'] else '',
             '' if inter['reparation'] else 'X',
             inter['informations'] or '',
@@ -1164,10 +1174,10 @@ def _build_tracabilite_xlsx(interventions, sheet_title, doc_title, photos_by_int
             cell.border = thin_border
             cell.font = Font(name='Arial', size=10)
 
-        ws.cell(row=row, column=12).border = thin_border
+        ws.cell(row=row, column=16).border = thin_border
 
-        # Type de formation (colonne M)
-        fcell = ws.cell(row=row, column=13, value=formation_label(inter))
+        # Type de formation (colonne Q)
+        fcell = ws.cell(row=row, column=17, value=formation_label(inter))
         fcell.alignment = left_center
         fcell.border = thin_border
         fcell.font = Font(name='Arial', size=10)
@@ -1180,9 +1190,9 @@ def _build_tracabilite_xlsx(interventions, sheet_title, doc_title, photos_by_int
                     img = XlImage(sig_file)
                     img.width = 120
                     img.height = 50
-                    ws.add_image(img, f'L{row}')
+                    ws.add_image(img, f'P{row}')
                 except Exception:
-                    ws.cell(row=row, column=12, value='[signature]')
+                    ws.cell(row=row, column=16, value='[signature]')
 
         # Photos
         if with_photos:
@@ -1201,7 +1211,7 @@ def _build_tracabilite_xlsx(interventions, sheet_title, doc_title, photos_by_int
                         ratio2 = 150 / float(img.width)
                         img.width = 150
                         img.height = int(img.height * ratio2)
-                    ws.add_image(img, f'{get_column_letter(14 + pj)}{row}')
+                    ws.add_image(img, f'{get_column_letter(18 + pj)}{row}')
                 except Exception:
                     pass
 
