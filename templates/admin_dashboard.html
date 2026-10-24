@@ -1,4 +1,5 @@
 {% extends "base_admin.html" %}
+{% from "_etat.html" import etat_tag %}
 {% block title %}Tableau de bord{% endblock %}
 {% block content_class %}admin-content--wide{% endblock %}
 
@@ -116,7 +117,7 @@
         {% if recent %}
         <div class="table-wrap admin-table">
             <table>
-                <thead><tr><th>Date</th><th>Mannequin</th><th>Par</th><th class="tc">Nett.</th><th class="tc">Poumons</th><th class="tc">Visage ch.</th><th class="tc">Visage nett.</th><th class="tc">Répar.</th></tr></thead>
+                <thead><tr><th>Date</th><th>Mannequin</th><th>Par</th><th class="tc">Nett.</th><th class="tc">Poumons</th><th class="tc">Visage ch.</th><th class="tc">Visage nett.</th><th class="tc">État</th><th class="tc">Répar.</th></tr></thead>
                 <tbody>
                     {% for i in recent %}
                     <tr>
@@ -127,7 +128,8 @@
                         <td class="tc">{% if i.changement_poumons %}<i class="ti ti-circle-check st-yes"></i>{% else %}<i class="ti ti-circle-x st-no"></i>{% endif %}</td>
                         <td class="tc">{% if i.visage_change is none %}<span class="st-no">—</span>{% elif i.visage_change %}<i class="ti ti-circle-check st-yes"></i>{% else %}<i class="ti ti-circle-x st-no"></i>{% endif %}</td>
                         <td class="tc">{% if i.visage_nettoye is none %}<span class="st-no">—</span>{% elif i.visage_nettoye %}<i class="ti ti-circle-check st-yes"></i>{% else %}<i class="ti ti-circle-x st-no"></i>{% endif %}</td>
-                        <td class="tc">{% if i.reparation %}<i class="ti ti-circle-x st-warn"></i>{% else %}<i class="ti ti-circle-check st-ok"></i>{% endif %}</td>
+                        <td class="tc">{% if i.etat %}{{ etat_tag(i.etat, court=true) }}{% else %}<span class="st-no">—</span>{% endif %}</td>
+                        <td class="tc">{% if i.etat is none or i.etat == 'defaut' %}{% if i.reparation %}<i class="ti ti-circle-x st-warn"></i>{% else %}<i class="ti ti-circle-check st-ok"></i>{% endif %}{% else %}<span class="st-no">—</span>{% endif %}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -147,7 +149,8 @@
                     {% if i.changement_poumons %}<span class="detail-tag tag-green"><i class="ti ti-circle-check"></i> Poumons</span>{% else %}<span class="detail-tag tag-gray"><i class="ti ti-circle-x"></i> Poumons</span>{% endif %}
                     {% if i.visage_change is not none %}{% if i.visage_change %}<span class="detail-tag tag-green"><i class="ti ti-circle-check"></i> Visage changé</span>{% else %}<span class="detail-tag tag-gray"><i class="ti ti-circle-x"></i> Visage changé</span>{% endif %}{% endif %}
                     {% if i.visage_nettoye is not none %}{% if i.visage_nettoye %}<span class="detail-tag tag-green"><i class="ti ti-circle-check"></i> Visage nettoyé</span>{% else %}<span class="detail-tag tag-gray"><i class="ti ti-circle-x"></i> Visage nettoyé</span>{% endif %}{% endif %}
-                    {% if i.reparation %}<span class="detail-tag tag-red"><i class="ti ti-alert-triangle"></i> Réparation</span>{% else %}<span class="detail-tag tag-green"><i class="ti ti-circle-check"></i> Réparation</span>{% endif %}
+                    {% if i.etat %}{{ etat_tag(i.etat, court=true) }}{% endif %}
+                    {% if i.etat is none or i.etat == 'defaut' %}{% if i.reparation %}<span class="detail-tag tag-red"><i class="ti ti-alert-triangle"></i> Réparation</span>{% else %}<span class="detail-tag tag-green"><i class="ti ti-circle-check"></i> Réparation</span>{% endif %}{% endif %}
                 </div>
             </div>
             {% endfor %}
